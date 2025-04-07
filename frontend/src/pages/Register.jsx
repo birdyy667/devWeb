@@ -1,79 +1,165 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // 1. importer
 
 
+function Inscription() {
 
-function Register() {
+  const navigate = useNavigate(); // 2. déclarer
 
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        motDePasse: '',
-        nom: '',
-        prenom: '',
-        typeMembre: '',
-        photo: '',
-        age: '',
-        genre: '',
-        dateNaissance: '',
-        point: 0,
-        idStatut: 1,
-        idEmplacement: 1,
-        idPlateforme: 1,
-      });
-      
+
+  const [formData, setFormData] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    motDePasse: '',
+    age: '',
+    genre: '',
+    dateDeNaissance: '',
+    photo: null,
+    typeMembre: 'standard',         // valeur par défaut
+    point: 0,                       // valeur par défaut
+    idStatut: 1,                   // valeur par défaut
+    idEmplacement: 1,
+    idPlateforme: 1
+  });
 
   const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    const formDataToSend = new FormData();
+    for (let key in formData) {
+      formDataToSend.append(key, formData[key]);
+    }
+  
+    console.log("📤 Envoi du formulaire...", formData);
+  
     try {
       const res = await fetch('http://localhost:3001/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: formDataToSend
       });
-
-      const data = await res.json();
-
+  
+      console.log("📥 Réponse brute :", res);
+  
+      let data = {};
+      try {
+        data = await res.json();
+        console.log("📦 Réponse JSON :", data);
+      } catch (jsonErr) {
+        console.warn("⚠️ Impossible de parser la réponse JSON :", jsonErr);
+      }
+  
       if (res.ok) {
-        setMessage('Compte créé avec succès ✅');
-        localStorage.setItem('userId', data.userId);
-        navigate('/dashboard'); // ⬅️ Redirige vers le dashboard
-
+        setMessage('🎉 Compte créé avec succès !');
+        navigate('/connexion');
+      } else if (res.status === 409) {
+        setMessage('❌ Cet email est déjà utilisé.');
       } else {
-        setMessage(`Erreur : ${data.error}`);
+        setMessage(`❌ Erreur serveur : ${data?.error || 'Erreur inconnue'}`);
       }
     } catch (err) {
-      console.error('❌ Erreur côté client :', err);
-      setMessage("Une erreur est survenue lors de l'envoi.");
+      console.error('❌ Erreur FETCH (réseau ou crash serveur) :', err);
+      setMessage('Erreur de connexion au serveur');
     }
   };
+  
+  
+  
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Créer un compte</h2>
-      <form onSubmit={handleSubmit}>
-  <input name="email" type="email" placeholder="Email" onChange={handleChange} value={formData.email} required /><br />
-  <input name="motDePasse" type="password" placeholder="Mot de passe" onChange={handleChange} value={formData.motDePasse} required /><br />
-  <input name="nom" placeholder="Nom" onChange={handleChange} value={formData.nom} /><br />
-  <input name="prenom" placeholder="Prénom" onChange={handleChange} value={formData.prenom} /><br />
-  <input name="typeMembre" placeholder="Type de membre" onChange={handleChange} value={formData.typeMembre} /><br />
-  <input name="photo" placeholder="Lien de la photo" onChange={handleChange} value={formData.photo} /><br />
-  <input name="age" type="number" placeholder="Âge" onChange={handleChange} value={formData.age} /><br />
-  <input name="genre" placeholder="Genre" onChange={handleChange} value={formData.genre} /><br />
-  <input name="dateNaissance" type="date" onChange={handleChange} value={formData.dateNaissance} /><br />
-  <button type="submit">Créer mon compte</button>
-</form>
+    <div className="min-h-screen bg-gradient-to-r from-blue-400 to-blue-700 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-semibold mb-6 text-center">Créer un compte</h2>
 
-      {message && <p>{message}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            name="prenom"
+            type="text"
+            placeholder="Prénom"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="nom"
+            type="text"
+            placeholder="Nom"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="motDePasse"
+            type="password"
+            placeholder="Mot de passe"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="age"
+            type="number"
+            placeholder="Âge"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="genre"
+            type="text"
+            placeholder="Genre"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="dateDeNaissance"
+            type="date"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="photo"
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Créer mon compte
+          </button>
+        </form>
+
+        {message && (
+          <p className="mt-4 text-center text-sm text-red-600">
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
 
-export default Register;
+export default Inscription;

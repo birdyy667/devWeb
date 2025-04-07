@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const multer = require('multer');
+const path = require('path');
+
+// Configuration de multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + ext);
+  }
+});
+const upload = multer({ storage });
 
 // GET tous les utilisateurs
 router.get('/utilisateurs', (req, res) => {
@@ -11,23 +24,38 @@ router.get('/utilisateurs', (req, res) => {
 });
 
 // Route POST : création de compte (register)
-router.post('/register', (req, res) => {
-    const {
-      email,
-      motDePasse,
-      nom,
-      prenom,
-      typeMembre,
-      photo,
-      age,
-      genre,
-      dateNaissance,
-      point,
-      idStatut,
-      idEmplacement,
-      idPlateforme
-    } = req.body;
-  
+// Route POST : création de compte (register)
+router.post('/register', upload.single('photo'), (req, res) => {
+  const {
+    email,
+    motDePasse,
+    nom,
+    prenom,
+    typeMembre,
+    age,
+    genre,
+    dateNaissance,
+    point,
+    idStatut,
+    idEmplacement,
+    idPlateforme
+  } = req.body;
+
+  const photo = req.file ? req.file.filename : null;
+
+  // 👉 Vérifier si l’email est déjà utilisé
+  const checkEmail = 'SELECT email FROM utilisateur WHERE email = ?';
+  db.query(checkEmail, [email], (err, results) => {
+    if (err) {
+      console.error("❌ Erreur SQL (vérif email) :", err);
+      return res.status(500).json({ error: 'Erreur SQL : ' + err.message });
+    }
+
+    if (results.length > 0) {
+      return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
+    }
+
+    // 👉 Si l’email est disponible, on continue normalement
     const sql = `
       INSERT INTO utilisateur (
         email, motDePasse, nom, prenom, typeMembre, photo,
@@ -36,7 +64,7 @@ router.post('/register', (req, res) => {
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-  
+
     const valeurs = [
       email,
       motDePasse,
@@ -52,19 +80,21 @@ router.post('/register', (req, res) => {
       idEmplacement,
       idPlateforme
     ];
-  
+
     db.query(sql, valeurs, (err, result) => {
       if (err) {
-        console.error("❌ Erreur SQL :", err);
+        console.error("❌ Erreur SQL (insert) :", err);
         return res.status(500).json({ error: 'Erreur SQL : ' + err.message });
       }
-  
+
       return res.status(201).json({
         message: '✅ Compte créé avec succès',
         userId: result.insertId
       });
     });
   });
+});
+
 
 module.exports = router;
 

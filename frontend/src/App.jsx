@@ -9,12 +9,12 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <Routes>
+
+      <Routes>                                                                                                                                                                                                   
         <Route path="/inscription" element={<Register />} />
         <Route path="/connexion" element={<Login />} />
         <Route
-          path="/dashboard"
-          element={
+          path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>

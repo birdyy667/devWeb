@@ -6,9 +6,12 @@ function Dashboard() {
   const [estConnecte, setEstConnecte] = useState(true); // simulation
 
   useEffect(() => {
-    // Simule un ID utilisateur (à remplacer par une variable réelle plus tard)
     const userId = localStorage.getItem('userId');
 
+    if (!userId) {
+      setMessage("Utilisateur non connecté.");
+      return;
+    }
 
     fetch(`http://localhost:3001/api/utilisateur/${userId}`)
       .then((res) => res.json())
@@ -20,29 +23,63 @@ function Dashboard() {
   }, []);
 
   if (!utilisateur) {
-    return <p>Chargement du profil...</p>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-white text-xl">Chargement du profil...</p>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>👤 Profil utilisateur</h2>
-      {message && <p>{message}</p>}
+    <div className="min-h-screen bg-gradient-to-r from-blue-400 to-blue-700 flex items-center justify-center p-6">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-xl space-y-6">
+        <h2 className="text-2xl font-bold text-center text-gray-800">👤 Profil utilisateur</h2>
 
-      <h3>🔓 Partie publique</h3>
-      <img src={utilisateur.photo} alt="Photo" style={{ width: '100px', borderRadius: '50%' }} />
-      <p><strong>Email / Pseudonyme :</strong> {utilisateur.email}</p>
-      <p><strong>Âge :</strong> {utilisateur.age} ans</p>
-      <p><strong>Genre :</strong> {utilisateur.genre}</p>
-      <p><strong>Date de naissance :</strong> {utilisateur.dateNaissance}</p>
-      <p><strong>Type de membre :</strong> {utilisateur.typeMembre}</p>
+        {message && (
+          <div className="text-red-600 text-center">
+            {message}
+          </div>
+        )}
 
-      {estConnecte && (
-        <>
-          <h3>🔐 Partie privée</h3>
-          <p><strong>Nom :</strong> {utilisateur.nom}</p>
-          <p><strong>Prénom :</strong> {utilisateur.prenom}</p>
-        </>
-      )}
+        <div className="flex flex-col items-center space-y-2">
+          <img
+            src={
+              utilisateur.photo
+                ? `http://localhost:3001/uploads/${utilisateur.photo}`
+                : '/default-avatar.png'
+            }
+            alt="Photo de profil"
+            className="w-24 h-24 rounded-full object-cover shadow"
+          />
+          <p className="text-gray-600">Type de membre : <span className="font-semibold">{utilisateur.typeMembre}</span></p>
+        </div>
+
+        <div className="border-t pt-4 space-y-2">
+          <h3 className="text-lg font-semibold text-blue-600">🔓 Partie publique</h3>
+          <p><strong>Email / Pseudonyme :</strong> {utilisateur.email}</p>
+          <p><strong>Âge :</strong> {utilisateur.age} ans</p>
+          <p><strong>Genre :</strong> {utilisateur.genre}</p>
+          <p><strong>Date de naissance :</strong> {new Date(utilisateur.dateNaissance).toLocaleDateString()}</p>
+        </div>
+
+        {estConnecte && (
+          <div className="border-t pt-4 space-y-2">
+            <h3 className="text-lg font-semibold text-blue-600">🔐 Partie privée</h3>
+            <p><strong>Nom :</strong> {utilisateur.nom}</p>
+            <p><strong>Prénom :</strong> {utilisateur.prenom}</p>
+          </div>
+        )}
+
+        <button
+          onClick={() => {
+            localStorage.removeItem('userId');
+            window.location.href = '/connexion';
+          }}
+          className="w-full mt-4 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
+        >
+          Déconnexion
+        </button>
+      </div>
     </div>
   );
 }

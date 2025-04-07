@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 function Login() {
-
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
     email: '',
     motDePasse: ''
   });
@@ -30,7 +28,6 @@ function Login() {
 
       if (res.ok) {
         setMessage(`🎉 Bienvenue, ${data.utilisateur.email} !`);
-          // Stocke l’ID dans le localStorage
         localStorage.setItem('userId', data.utilisateur.id);
         navigate('/dashboard');
       } else {
@@ -43,14 +40,41 @@ function Login() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Connexion</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="email" type="email" placeholder="Email" onChange={handleChange} required /><br />
-        <input name="motDePasse" type="password" placeholder="Mot de passe" onChange={handleChange} required /><br />
-        <button type="submit">Se connecter</button>
-      </form>
-      {message && <p>{message}</p>}
+    <div className="min-h-screen bg-gradient-to-r from-blue-400 to-blue-700 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-semibold mb-6 text-center">Connexion</h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="motDePasse"
+            type="password"
+            placeholder="Mot de passe"
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Se connecter
+          </button>
+        </form>
+
+        {message && (
+          <p className="mt-4 text-center text-sm text-red-600">
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
