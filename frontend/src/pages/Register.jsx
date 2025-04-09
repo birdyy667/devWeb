@@ -166,6 +166,16 @@ function Inscription() {
             {message}
           </p>
         )}
+        
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <span>Déjà inscrit ? </span>
+          <button
+            onClick={() => navigate('/connexion')}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Se connecter
+          </button>
+        </div>
       </div>
     </div>
   );

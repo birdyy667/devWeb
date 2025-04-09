@@ -77,11 +77,28 @@ function Login() {
           </button>
         </form>
 
+        <p className="mt-4 text-sm text-center text-blue-600">
+          <a href="/mot-de-passe-oublie" className="hover:underline">
+            Mot de passe oublié ?
+          </a>
+        </p>
+
+
         {message && (
           <p className="mt-4 text-center text-sm text-red-600">
             {message}
           </p>
         )}
+
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <span>Pas encore de compte ? </span>
+          <button
+            onClick={() => navigate('/inscription')}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Créer un compte
+          </button>
+        </div>
       </div>
     </div>
   );

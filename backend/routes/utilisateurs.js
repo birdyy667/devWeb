@@ -135,6 +135,169 @@ transporter.sendMail(mailOptions, (err, info) => {
   });
 });
 
+// Route PUT : mise à jour des infos utilisateur (sauf email et mot de passe)
+router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
+  const id = req.params.id;
+  const {
+    nom,
+    prenom,
+    age,
+    genre,
+    dateNaissance
+  } = req.body;
+
+  const photo = req.file ? req.file.filename : null;
+
+  const champs = [];
+  const valeurs = [];
+
+  if (nom) {
+    champs.push("nom = ?");
+    valeurs.push(nom);
+  }
+  if (prenom) {
+    champs.push("prenom = ?");
+    valeurs.push(prenom);
+  }
+  if (age) {
+    champs.push("age = ?");
+    valeurs.push(age);
+  }
+  if (genre) {
+    champs.push("genre = ?");
+    valeurs.push(genre);
+  }
+
+  // ✅ Vérification et formatage de la date
+  if (dateNaissance) {
+    const dateObj = new Date(dateNaissance);
+    if (!isNaN(dateObj.getTime())) {
+      const formattedDate = dateObj.toISOString().slice(0, 10); // YYYY-MM-DD
+      champs.push("dateNaissance = ?");
+      valeurs.push(formattedDate);
+    } else {
+      return res.status(400).json({ error: "Date de naissance invalide." });
+    }
+  }
+
+  if (photo) {
+    champs.push("photo = ?");
+    valeurs.push(photo);
+  }
+
+  if (champs.length === 0) {
+    return res.status(400).json({ error: "Aucune donnée à mettre à jour." });
+  }
+
+  const sql = `
+    UPDATE utilisateur 
+    SET ${champs.join(', ')} 
+    WHERE idUtilisateur = ?
+  `;
+  valeurs.push(id);
+
+  db.query(sql, valeurs, (err, result) => {
+    if (err) {
+      console.error("❌ Erreur SQL (update) :", err);
+      return res.status(500).json({ error: "Erreur lors de la mise à jour" });
+    }
+
+    res.status(200).json({ message: "✅ Profil mis à jour avec succès" });
+  });
+});
+
+// Route POST : demande de réinitialisation de mot de passe
+router.post('/forgot-password', (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email requis' });
+  }
+
+  const tokenReset = crypto.randomBytes(32).toString('hex');
+  const expirationReset = new Date(Date.now() + 60 * 60 * 1000); // expire dans 1h
+
+  const updateSql = `
+    UPDATE utilisateur SET tokenReset = ?, expirationReset = ?
+    WHERE email = ?
+  `;
+
+  db.query(updateSql, [tokenReset, expirationReset, email], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Erreur SQL' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Aucun utilisateur trouvé pour cet email" });
+    }
+
+    // Envoi de l'email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'acceslycontact@gmail.com',
+        pass: 'teqw bolj xjup wqtj '
+      }
+    });
+
+    const resetUrl = `http://localhost:5173/reset-password/${tokenReset}`;
+
+    const mailOptions = {
+      from: 'Accessly <acceslycontact@gmail.com>',
+      to: email,
+      subject: 'Réinitialisation du mot de passe - Accessly',
+      html: `<p>Tu as demandé une réinitialisation de ton mot de passe.</p>
+             <p>Clique ici pour créer un nouveau mot de passe :</p>
+             <a href="${resetUrl}">${resetUrl}</a>
+             <p>Ce lien expirera dans 1 heure.</p>`
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Erreur envoi email :", err);
+        return res.status(500).json({ error: "Erreur lors de l'envoi de l'email" });
+      }
+      console.log("Email de réinitialisation envoyé :", info.response);
+      res.status(200).json({ message: "Lien de réinitialisation envoyé" });
+    });
+  });
+});
+
+// Route PUT : réinitialisation du mot de passe
+router.put('/reset-password/:token', (req, res) => {
+  const token = req.params.token;
+  const { motDePasse } = req.body;
+
+  if (!motDePasse) {
+    return res.status(400).json({ error: 'Mot de passe requis' });
+  }
+
+  const selectSql = `
+    SELECT idUtilisateur FROM utilisateur
+    WHERE tokenReset = ? AND expirationReset > NOW()
+  `;
+
+  db.query(selectSql, [token], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erreur SQL" });
+
+    if (results.length === 0) {
+      return res.status(400).json({ error: "Lien invalide ou expiré" });
+    }
+
+    const id = results[0].idUtilisateur;
+
+    const updateSql = `
+      UPDATE utilisateur 
+      SET motDePasse = ?, tokenReset = NULL, expirationReset = NULL
+      WHERE idUtilisateur = ?
+    `;
+
+    db.query(updateSql, [motDePasse, id], (err2) => {
+      if (err2) return res.status(500).json({ error: "Erreur mise à jour mot de passe" });
+
+      res.status(200).json({ message: "Mot de passe réinitialisé avec succès." });
+    });
+  });
+});
+
+
 module.exports = router;
 
 
@@ -175,6 +338,72 @@ router.post('/login', (req, res) => {
       });
     });
   });
+
+  //ROUT Post re-innitialisation mot de passe
+  
+  router.post('/motdepasse-oublie', (req, res) => {
+    const { email } = req.body;
+  
+    const sql = `SELECT idUtilisateur, prenom FROM utilisateur WHERE email = ?`;
+    db.query(sql, [email], (err, results) => {
+      if (err) {
+        console.error("Erreur SQL : ", err);
+        return res.status(500).json({ error: "Erreur serveur" });
+      }
+  
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Aucun compte trouvé avec cet email" });
+      }
+  
+      const utilisateur = results[0];
+      const tokenReset = crypto.randomBytes(32).toString('hex');
+      const expirationReset = new Date(Date.now() + 3600000); // 1h
+  
+      const updateSql = `
+        UPDATE utilisateur
+        SET tokenReset = ?, expirationReset = ?
+        WHERE idUtilisateur = ?
+      `;
+  
+      db.query(updateSql, [tokenReset, expirationReset, utilisateur.idUtilisateur], (err2) => {
+        if (err2) {
+          console.error("Erreur mise à jour token reset :", err2);
+          return res.status(500).json({ error: "Erreur serveur" });
+        }
+  
+        // Envoi de l'email
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'acceslycontact@gmail.com',
+            pass: 'teqw bolj xjup wqtj'
+          }
+        });
+  
+        const lien = `http://localhost:5173/reinitialiser-mot-de-passe/${tokenReset}`;
+  
+        const mailOptions = {
+          from: '"Accessly" <acceslycontact@gmail.com>',
+          to: email,
+          subject: '🔐 Réinitialise ton mot de passe',
+          html: `<p>Bonjour ${utilisateur.prenom},</p>
+                 <p>Tu peux réinitialiser ton mot de passe en cliquant sur ce lien :</p>
+                 <a href="${lien}">${lien}</a>
+                 <p>Ce lien est valable 1 heure.</p>`
+        };
+  
+        transporter.sendMail(mailOptions, (err3, info) => {
+          if (err3) {
+            console.error("Erreur envoi mail :", err3);
+            return res.status(500).json({ error: "Erreur envoi de mail" });
+          }
+  
+          res.status(200).json({ message: "Email de réinitialisation envoyé." });
+        });
+      });
+    });
+  });
+  
   
 
 // Route GET : infos d'un utilisateur par son ID
@@ -203,7 +432,6 @@ router.get('/utilisateur/:id', (req, res) => {
     const token = req.params.token;
     console.log("📩 Token reçu :", token);
   
-    // Étape 1 : vérifier s'il y a un utilisateur avec ce token actif
     const selectSql = `
       SELECT idUtilisateur FROM utilisateur 
       WHERE tokenValidation = ? AND expirationToken > NOW()
@@ -215,47 +443,32 @@ router.get('/utilisateur/:id', (req, res) => {
         return res.status(500).json({ error: "Erreur SQL" });
       }
   
-      // ✅ Si le token est encore valide
-      if (results.length > 0) {
-        const id = results[0].idUtilisateur;
+      console.log("📥 Résultat SELECT :", results);
   
-        const updateSql = `
-          UPDATE utilisateur 
-          SET estVerifie = 1, tokenValidation = NULL, expirationToken = NULL 
-          WHERE idUtilisateur = ?
-        `;
-  
-        db.query(updateSql, [id], (err2, result2) => {
-          if (err2) {
-            console.error("❌ Erreur UPDATE :", err2);
-            return res.status(500).json({ error: "Erreur de mise à jour" });
-          }
-  
-          console.log("✅ Compte activé pour l'utilisateur :", id);
-          return res.status(200).json({ message: "✅ Compte activé avec succès !" });
-        });
-  
-      } else {
-        // Étape 2 : si pas de token actif, vérifier si déjà vérifié
-        const checkIfAlreadyVerified = `
-          SELECT estVerifie FROM utilisateur 
-          WHERE tokenValidation IS NULL AND expirationToken IS NULL AND estVerifie = 1
-        `;
-  
-        db.query(checkIfAlreadyVerified, (err3, verifiedResults) => {
-          if (err3) {
-            console.error("❌ Erreur SELECT (déjà vérifié) :", err3);
-            return res.status(500).json({ error: "Erreur SQL" });
-          }
-  
-          if (verifiedResults.length > 0) {
-            return res.status(200).json({ message: "⚠️ Ce compte est déjà activé." });
-          }
-  
-          // Sinon : lien réellement invalide ou expiré
-          return res.status(400).json({ error: "Lien invalide ou expiré" });
-        });
+      if (results.length === 0) {
+        return res.status(400).json({ error: "Lien invalide ou expiré" });
       }
+  
+      const id = results[0].idUtilisateur;
+      console.log("✅ ID trouvé :", id);
+  
+      const updateSql = `
+        UPDATE utilisateur 
+        SET estVerifie = 1, tokenValidation = NULL, expirationToken = NULL 
+        WHERE idUtilisateur = ?
+      `;
+  
+      db.query(updateSql, [id], (err2, result2) => {
+        if (err2) {
+          console.error("❌ Erreur UPDATE :", err2);
+          return res.status(500).json({ error: "Erreur de mise à jour" });
+        }
+  
+        console.log("🛠️ Résultat UPDATE :", result2);
+        res.status(200).json({ message: "✅ Compte activé avec succès !" });
+      });
     });
   });
+  
+
   
