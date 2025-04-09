@@ -78,7 +78,7 @@ function Dashboard() {
           className="w-full mt-4 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
         >
           Déconnexion
-        </button>
+        </button> 
       </div>
     </div>
   );
