@@ -139,6 +139,9 @@ CREATE TABLE `utilisateur` (
   `prenom` varchar(100) DEFAULT NULL,
   `photo` varchar(255) DEFAULT NULL,
   `typeMembre` varchar(100) DEFAULT NULL,
+  `estVerifie` tinyint(1) DEFAULT '0',
+  `tokenValidation` varchar(255) DEFAULT NULL,
+  `expirationToken` datetime DEFAULT NULL,
   PRIMARY KEY (`idUtilisateur`),
   UNIQUE KEY `email` (`email`),
   KEY `idEmplacement` (`idEmplacement`),
@@ -147,7 +150,7 @@ CREATE TABLE `utilisateur` (
   CONSTRAINT `utilisateur_ibfk_1` FOREIGN KEY (`idEmplacement`) REFERENCES `emplacement` (`idEmplacement`),
   CONSTRAINT `utilisateur_ibfk_2` FOREIGN KEY (`idStatut`) REFERENCES `statut` (`id`),
   CONSTRAINT `utilisateur_ibfk_3` FOREIGN KEY (`idPlateforme`) REFERENCES `plateforme` (`idPlateforme`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,7 +159,7 @@ CREATE TABLE `utilisateur` (
 
 LOCK TABLES `utilisateur` WRITE;
 /*!40000 ALTER TABLE `utilisateur` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (2,1,1,28,'Homme','1995-05-21',10,1,'','',NULL,NULL,NULL,NULL),(3,1,1,21,'H','2003-01-08',0,1,'Jalis@gmail.com','01020304',NULL,NULL,NULL,NULL),(5,1,1,13,'H','2003-02-08',0,1,'jalis2@gmail.com','klingler',NULL,NULL,NULL,NULL),(6,1,1,21,'H','2003-02-08',0,1,'Jalis3@gmail.com','01020304',NULL,NULL,NULL,NULL),(7,1,1,21,'H','2003-02-08',0,1,'Jalis4@gmail.com','01020304','KLINGLER','Jalis','JJJJ','H'),(8,1,1,21,'h','2003-02-08',0,1,'jalis77@gmail.com','01020304','KLINGLER','Jalis','llzlzkja','H');
+INSERT INTO `utilisateur` VALUES (2,1,1,28,'Homme','1995-05-21',10,1,'','',NULL,NULL,NULL,NULL,0,NULL,NULL),(3,1,1,21,'H','2003-01-08',0,1,'Jalis@gmail.com','01020304',NULL,NULL,NULL,NULL,0,NULL,NULL),(5,1,1,13,'H','2003-02-08',0,1,'jalis2@gmail.com','klingler',NULL,NULL,NULL,NULL,0,NULL,NULL),(6,1,1,21,'H','2003-02-08',0,1,'Jalis3@gmail.com','01020304',NULL,NULL,NULL,NULL,0,NULL,NULL),(7,1,1,21,'H','2003-02-08',0,1,'Jalis4@gmail.com','01020304','KLINGLER','Jalis','JJJJ','H',0,NULL,NULL),(8,1,1,21,'h','2003-02-08',0,1,'jalis77@gmail.com','01020304','KLINGLER','Jalis','llzlzkja','H',0,NULL,NULL),(9,1,1,21,'H','2003-02-08',0,1,'jalis7@gmail.com','01020304',NULL,NULL,'1743932549744-813740847.png',NULL,0,NULL,NULL),(10,1,1,21,'H','2003-02-08',0,1,'jalis9@gmail.com','01020304',NULL,NULL,'1743932784994-63599741.png',NULL,0,NULL,NULL),(12,1,1,21,'H','2003-02-08',0,1,'Jalis10@gmail.com','01020304',NULL,NULL,NULL,NULL,0,NULL,NULL),(13,1,1,21,'H',NULL,0,1,'jaliskkkk@gmail.com','01020304','klingler','jalis',NULL,'standard',0,NULL,NULL),(15,1,1,21,'H',NULL,0,1,'jaliskkkKk@gmail.com','01020304','klingler','jalis','1744015906824-438871040.png','standard',0,NULL,NULL),(17,1,1,21,'h',NULL,0,1,'jalissssklingler@gmail.com','01020304','klingler','jalis','1744016729121-893940483.png','standard',0,NULL,NULL),(18,1,1,21,'h',NULL,0,1,'Ja@gmail.com','01020304','KLINGLER','Jalis','1744016878547-36319517.png','standard',0,NULL,NULL),(19,1,1,21,'h',NULL,0,1,'a@gmail.com','01020304','KLINGLER','Jalis','1744016954773-645478264.png','standard',0,NULL,NULL),(20,1,1,21,'h',NULL,0,1,'aa@gmail.com','01020304','KLINGLER','Jalis','1744017007624-861867569.png','standard',0,NULL,NULL),(21,1,1,21,'h',NULL,0,1,'aaa@gmail.com','01020304','KLINGLER','Jalis','1744017093006-875168518.png','standard',0,NULL,NULL),(22,1,1,21,'h',NULL,0,1,'jalisaa@gmail.com','01020304','klingler','jalis','1744017123972-485217879.png','standard',0,NULL,NULL),(23,1,1,21,'h',NULL,0,1,'k@gmail.com','01020304','kk','jjaj','1744017257597-132865946.png','standard',0,NULL,NULL),(24,1,1,21,'H',NULL,0,1,'jaja@gmail.com','01020304','klingler','jalis','1744017371013-199539355.png','standard',0,NULL,NULL),(25,1,1,21,'H',NULL,0,1,'kaka@gmail.com','01020304','klingler','jaja',NULL,'standard',0,NULL,NULL),(26,1,1,21,'H',NULL,0,1,'123@gmail.com','01020304','KLINGLER','Jalis','1744017986911-884785289.png','standard',0,NULL,NULL),(28,1,1,21,'h',NULL,0,1,'jalisklingler@gmail.com','01020304','KLINGLER','Jalis','1744186862864-483437556.png','standard',0,'b92eadbbe83ba0de4212b932c43398b82c37f69414bc9369df14639b4bfb4ac7','2025-04-09 11:21:03'),(30,1,1,21,'H',NULL,0,1,'jalisklingler845@gmail.com','01020304','klingler','JALIS','1744189893237-193982863.png','standard',1,NULL,NULL),(31,1,1,19,'k',NULL,0,1,'legil37595@lesotica.com','01020304','k','m','1744189989645-571791783.png','standard',1,NULL,NULL),(32,1,1,5,'5',NULL,0,1,'romafo4322@lesotica.com','01020304','k','l','1744190147461-469861578.png','standard',1,NULL,NULL),(33,1,1,21,'h',NULL,0,1,'behog55979@lesotica.com','01020304','k','k',NULL,'standard',1,NULL,NULL),(34,1,1,21,'18',NULL,0,1,'datomex573@movfull.com','01020304','k','k','1744190539816-777650333.png','standard',1,NULL,NULL),(35,1,1,15,'h',NULL,0,1,'negirom428@movfull.com','01020304','l','l',NULL,'standard',1,NULL,NULL),(36,1,1,21,'h',NULL,0,1,'gateco2275@movfull.com','01020304','l','l',NULL,'standard',1,NULL,NULL),(37,1,1,21,'h',NULL,0,1,'ciregi9960@lesotica.com','01020304','k','k',NULL,'standard',1,NULL,NULL),(38,1,1,21,'h',NULL,0,1,'sibatoy367@lesotica.com','01020304','k','k',NULL,'standard',1,NULL,NULL);
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -169,4 +172,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-05 18:45:15
+-- Dump completed on 2025-04-09 12:13:56
