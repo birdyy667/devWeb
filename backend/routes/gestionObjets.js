@@ -6,8 +6,8 @@ const db = require('../config/db');
 router.post('/ajouter', (req, res) => {
   const { nom, statut, outils, idPlateforme } = req.body;
   db.query(
-    'INSERT INTO objet_connecte (nom, description, statut, outils, idPlateforme) VALUES (?, ?, ?, ?, ?)',
-    [nom, description, statut, JSON.stringify(outils), idPlateforme],
+    'INSERT INTO objet_connecte (nom, statut, outils, idPlateforme) VALUES (?, ?, ?, ?)',
+    [nom, statut, JSON.stringify(outils), idPlateforme],
     (err, result) => {
       if (err) return res.status(500).json({ message: 'Erreur', error: err });
       res.status(201).json({ message: 'Objet ajouté avec succès' });
@@ -18,10 +18,10 @@ router.post('/ajouter', (req, res) => {
 // 2. Modifier un objet connecté
 router.put('/modifier/:id', (req, res) => {
   const { id } = req.params;
-  const { nom, description, statut, outils } = req.body;
+  const { nom,  statut, outils } = req.body;
   db.query(
-    'UPDATE objet_connecte SET nom = ?, description = ?, statut = ?, outils = ? WHERE idObjetConnecte = ?',
-    [nom, description, statut, JSON.stringify(outils), id],
+    'UPDATE objet_connecte SET nom = ?, statut = ?, outils = ? WHERE idObjetConnecte = ?',
+    [nom,  statut, JSON.stringify(outils), id],
     (err, result) => {
       if (err) return res.status(500).json({ message: 'Erreur', error: err });
       res.status(200).json({ message: 'Objet modifié avec succès' });
