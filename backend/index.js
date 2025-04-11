@@ -7,6 +7,9 @@ const mysql = require('mysql2');
 app.use(cors());
 app.use(express.json());
 
+// ✅ Servir les fichiers statiques (images de profil)
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 const utilisateursRoutes = require('./routes/utilisateurs');
 app.use('/api', utilisateursRoutes);
@@ -19,4 +22,3 @@ const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Backend lancé sur http://localhost:${PORT}`);
 });
-
