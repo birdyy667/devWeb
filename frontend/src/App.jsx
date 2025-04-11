@@ -7,7 +7,6 @@ import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import AjoutObjets from './components/AjoutObjets';
 import ListeObjets from './components/ListeObjets';
-import ModifObjets from './components/ModifObjets';
 import Confirmation from './pages/Confirmation';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
