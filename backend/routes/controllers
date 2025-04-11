@@ -1,0 +1,81 @@
+// controllers/user.controller.js
+
+const db = require('../config/db');
+
+// Créer un nouvel utilisateur
+exports.createUser = async (req, res) => {
+  const { username, email, password, accessLevel } = req.body;
+  try {
+    const [rows] = await db.execute(
+      'INSERT INTO users (username, email, password, access_level) VALUES (?, ?, ?, ?)',
+      [username, email, password, accessLevel]
+    );
+    res.status(201).json({ message: 'Utilisateur créé', userId: rows.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la création de l\'utilisateur' });
+  }
+};
+
+// Mettre à jour un utilisateur
+exports.updateUser = async (req, res) => {
+  const { userId, username, email, password, accessLevel } = req.body;
+  try {
+    await db.execute(
+      'UPDATE users SET username = ?, email = ?, password = ?, access_level = ? WHERE id = ?',
+      [username, email, password, accessLevel, userId]
+    );
+    res.status(200).json({ message: 'Utilisateur mis à jour' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'utilisateur' });
+  }
+};
+
+// Supprimer un utilisateur
+exports.deleteUser = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    await db.execute('DELETE FROM users WHERE id = ?', [userId]);
+    res.status(200).json({ message: 'Utilisateur supprimé' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la suppression de l\'utilisateur' });
+  }
+};
+
+// Attribuer un niveau d'accès
+exports.setAccessLevel = async (req, res) => {
+  const { userId, accessLevel } = req.body;
+  try {
+    await db.execute('UPDATE users SET access_level = ? WHERE id = ?', [accessLevel, userId]);
+    res.status(200).json({ message: 'Niveau d\'accès mis à jour' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de l\'attribution du niveau d\'accès' });
+  }
+};
+
+// Révoquer un niveau d'accès
+exports.revokeAccessLevel = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    await db.execute('UPDATE users SET access_level = NULL WHERE id = ?', [userId]);
+    res.status(200).json({ message: 'Niveau d\'accès révoqué' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la révocation du niveau d\'accès' });
+  }
+};
+
+// Récupérer l'historique des actions d'un utilisateur
+exports.getUserLogs = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const [rows] = await db.execute('SELECT * FROM user_logs WHERE user_id = ?', [userId]);
+    res.status(200).json({ logs: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la récupération des logs' });
+  }
+};
