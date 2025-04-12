@@ -1,35 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AssocierZone from './AssocierZone';
 import ConfigurerObjet from './ConfigurerObjet';
 
 function ListeObjets({ objects, setObjects }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fonction pour gérer la suppression d'un objet
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/api/gestionObjets/supprimer/${id}`);
+      setLoading(true);
+      await axios.delete(`http://localhost:3001/api/gestion-objets/supprimer/${id}`);
       setObjects(objects.filter(obj => obj.idObjetConnecte !== id));
     } catch (error) {
-      console.error("Erreur lors de la suppression de l'objet", error);
+      setError("Erreur lors de la suppression de l'objet.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Fonction pour basculer le statut d'un objet
   const toggleEtat = async (id, currentStatut) => {
     const nouveauStatut = currentStatut === 'actif' ? 'inactif' : 'actif';
     try {
-      await axios.patch(`http://localhost:3001/api/gestionObjets/etat/${id}`, { statut: nouveauStatut });
+      setLoading(true);
+      await axios.patch(`http://localhost:3001/api/gestion-objets/etat/${id}`, { statut: nouveauStatut });
       setObjects(prev =>
         prev.map(obj =>
           obj.idObjetConnecte === id ? { ...obj, statut: nouveauStatut } : obj
         )
       );
     } catch (error) {
-      console.error('Erreur lors du changement de statut', error);
+      setError('Erreur lors du changement de statut');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
       <h2>Liste des Objets Connectés</h2>
+
+      {error && <div style={{ color: 'red', marginBottom: '20px' }}>{error}</div>}
+
       <ul>
         {objects.map((obj) => (
           <li
@@ -42,7 +58,17 @@ function ListeObjets({ objects, setObjects }) {
           >
             <strong>{obj.nom}</strong> - Statut : {obj.statut}
             <br />
-            <button onClick={() => handleDelete(obj.idObjetConnecte)}>Supprimer</button>
+            <strong>ID Plateforme:</strong> {obj.idPlateforme}
+            <br />
+            <strong>Outils:</strong> {obj.outils ? JSON.stringify(obj.outils) : 'Aucun'}
+            <br />
+            <button
+              onClick={() => handleDelete(obj.idObjetConnecte)}
+              disabled={loading}
+            >
+              {loading ? 'Suppression...' : 'Supprimer'}
+            </button>
+
             <button
               style={{
                 marginLeft: '10px',
@@ -54,8 +80,9 @@ function ListeObjets({ objects, setObjects }) {
                 transition: 'background-color 0.3s'
               }}
               onClick={() => toggleEtat(obj.idObjetConnecte, obj.statut)}
+              disabled={loading}
             >
-              {obj.statut === 'actif' ? 'Désactiver' : 'Activer'}
+              {loading ? 'Changement...' : (obj.statut === 'actif' ? 'Désactiver' : 'Activer')}
             </button>
 
             {/* Associer une zone */}
@@ -79,4 +106,3 @@ function ListeObjets({ objects, setObjects }) {
 }
 
 export default ListeObjets;
-

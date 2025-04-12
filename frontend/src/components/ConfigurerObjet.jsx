@@ -9,7 +9,7 @@ function ConfigurerObjet({ objectId }) {
     e.preventDefault();
     try {
       const configuration = JSON.parse(jsonText);
-      await axios.patch(`http://localhost:3001/api/gestionObjets/configurer/${objectId}`, {
+      await axios.patch(`http://localhost:3001/api/gestion-objets/configurer/${objectId}`, {
         configuration,
       });
       setMessage('Configuration mise à jour avec succès.');

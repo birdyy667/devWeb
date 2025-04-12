@@ -3,21 +3,31 @@ import axios from 'axios';
 
 function AjoutObjets({ setObjects }) {
   const [nom, setNom] = useState('');
-  const [statut, setStatut] = useState('actif');  // Ajout d'un statut
+  const [statut, setStatut] = useState('actif');
   const [outils, setOutils] = useState('');
   const [idPlateforme, setIdPlateforme] = useState('');
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:3001/api/gestionObjets/ajouter', {
-        nom, statut, outils, idPlateforme
+      // Convertir les outils en objet JSON si nécessaire
+      const outilsJson = outils ? JSON.parse(outils) : {};
+
+      const response = await axios.post('http://localhost:3001/api/gestion-objets/ajouter', {
+        nom,
+        statut,
+        outils: outilsJson,
+        idPlateforme,
       });
+
+      // Ajouter l'objet à la liste
       setObjects((prevObjects) => [...prevObjects, response.data]);
-      // Réinitialiser le formulaire après l'ajout
+
+      // Réinitialiser le formulaire
       setNom('');
-      setStatut('actif');  // Réinitialiser le statut
+      setStatut('actif');
       setOutils('');
       setIdPlateforme('');
     } catch (error) {
@@ -43,7 +53,7 @@ function AjoutObjets({ setObjects }) {
         <div>
           <input
             type="text"
-            placeholder="Outils"
+            placeholder="Outils "
             value={outils}
             onChange={(e) => setOutils(e.target.value)}
           />
@@ -72,5 +82,3 @@ function AjoutObjets({ setObjects }) {
 }
 
 export default AjoutObjets;
-
-

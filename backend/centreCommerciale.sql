@@ -52,6 +52,7 @@ DROP TABLE IF EXISTS `objet_connecte`;
 CREATE TABLE `objet_connecte` (
   `idObjetConnecte` int NOT NULL AUTO_INCREMENT,
   `nom` varchar(100) DEFAULT NULL,
+  `statut` varchar(20) DEFAULT 'inactif',
   `outils` json DEFAULT NULL,
   `idPlateforme` int NOT NULL,
   PRIMARY KEY (`idObjetConnecte`),

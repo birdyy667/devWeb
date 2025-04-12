@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const mysql = require('mysql2');
 
 // Middleware
 app.use(cors());
@@ -11,7 +12,7 @@ const utilisateursRoutes = require('./routes/utilisateurs');
 app.use('/api', utilisateursRoutes);
 
 const gestionObjetsRoutes = require('./routes/gestionObjets');
-app.use('/api/gestionObjets', gestionObjetsRoutes);
+app.use('/api/gestion-objets', gestionObjetsRoutes);
 
 // Démarrer le serveur
 const PORT = 3001;

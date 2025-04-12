@@ -1,38 +1,33 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 function AssocierZone({ objectId }) {
   const [zone, setZone] = useState('');
-  const [message, setMessage] = useState('');
 
-  const handleAssocier = async (e) => {
-    e.preventDefault();
+  const handleAssocier = async () => {
     try {
-      await axios.patch(`http://localhost:3001/api/gestionObjets/associerZone/${objectId}`, {
-        zone
+      await axios.patch(`http://localhost:3001/api/gestion-objets/configurer/${objectId}`, {
+        outils: {
+          zone: zone
+        }
       });
-      setMessage(`Zone "${zone}" associée avec succès.`);
-      setZone('');
-    } catch (error) {
-      console.error('Erreur association zone :', error);
-      setMessage('Erreur lors de l\'association de la zone.');
+      alert('Zone associée avec succès !');
+    } catch (err) {
+      console.error('Erreur lors de l’association de la zone', err);
     }
   };
 
   return (
     <div>
-      <h4>Associer à une zone</h4>
-      <form onSubmit={handleAssocier}>
-        <input
-          type="text"
-          placeholder="Ex: Salon, Bureau..."
-          value={zone}
-          onChange={(e) => setZone(e.target.value)}
-          required
-        />
-        <button type="submit">Associer</button>
-      </form>
-      {message && <p>{message}</p>}
+      <input
+        type="text"
+        placeholder="Nom de la zone"
+        value={zone}
+        onChange={(e) => setZone(e.target.value)}
+      />
+      <button onClick={handleAssocier} style={{ marginLeft: '10px' }}>
+        Associer Zone
+      </button>
     </div>
   );
 }

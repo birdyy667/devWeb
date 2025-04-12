@@ -43,8 +43,7 @@ function App() {
           }
         />
         {/* Nouvelle route pour la gestion des objets */}
-        <Route
-          path="/gestion-objets"element={<GestionObjets /> } />
+        <Route path="/gestion-objets"element={<GestionObjets /> } />
 
       </Routes>
     </BrowserRouter>
