@@ -95,34 +95,37 @@ router.post(
 );
 
 
-/*
-// Route GET: recherche de la valeur dans bdd
-router.get('/check', (req, res) => {
-	const query = req.query.query;
+// Route POST : connexion utilisateur
+router.post('/findObject', (req, res) => {
+    const { idObjet } = req.body;
+  
+    if (!idObjet) {
+      return res.status(400).json({ error: 'Identifiant non collecté' });
+    }
+  
+    const sql = `
+      SELECT * FROM objet_connecte WHERE idObjetConnecte = ?
+    `;
+  
+    db.query(sql, [idObjet], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+  
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'Identifiant incorrect' });
+      }
+  
+      const obj = results[0];
 
-	if (!query) {
-		return res.status(400).json({ error: 'Missing search query' });
-	}
-
-	const sql = `
-		SELECT id, nom, outils
-		FROM objet_connecte 
-		WHERE (nom LIKE ? OR outils LIKE ?)
-		LIMIT 10
-	`;
-
-	db.query(sql, [`%${query}%`, `%${query}%`], (err, results) => {
-		if (err) {
-			console.error("❌ Erreur SQL (check) :", err);
-			return res.status(500).json({ error: 'Erreur SQL : ' + err.message });
-		}
-		
-		const exists = (results.length > 0);
-
-		res.json({ exists });		// 👈 this is what your frontend expects
-	});
-});
-*/
+      res.status(200).json({
+        message: 'Objet trouvé ✅',
+        objet: {
+          id: obj.idObjetConnecte,
+          nom: obj.nom,
+          outils: obj.outils,
+        }
+      });
+    });
+  });
 
 // Route GET : infos d'un objet par son identifiant
 router.get(
@@ -130,7 +133,7 @@ router.get(
 		const objId = req.params.id;
 		
 		const sql = `
-			SELECT idObjetConnecte, nom, outils, photo, idPlateforme
+			SELECT idObjetConnecte, nom, outils, idPlateforme
 			FROM objet_connecte
 			WHERE idObjetConnecte = ?
 		`;

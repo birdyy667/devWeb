@@ -17,6 +17,9 @@ app.use('/api', utilisateursRoutes);
 const gestionObjetsRoutes = require('./routes/gestionObjets');
 app.use('/api/gestion-objets', gestionObjetsRoutes);
 
+const rechercheRoutes = require('./routes/recherche');
+app.use('/api/recherche', rechercheRoutes);
+
 // Démarrer le serveur
 const PORT = 3001;
 app.listen(PORT, () => {
