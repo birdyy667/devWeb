@@ -8,6 +8,10 @@ function Recherche() {
 	const navigate = useNavigate();
 	const [input, setInput] = useState('');
 	const [result, setResult] = useState(null);
+	const [formData, setFormData] = useState({
+		nom: '',
+		outils: ''
+	  });
 
 	/*
 	useEffect(
@@ -26,7 +30,7 @@ function Recherche() {
 			const delayDebounce = setTimeout(
 				() => {
 					if (input.trim()) {
-						result = fetch(`http://localhost:3001/api/recherche/check?query=${input}`)
+						fetch(`http://localhost:3001/api/recherche/recherche?query=${input}`)
 						.then(res => res.json())
 						.then(data => setResult(data));
 					}
@@ -39,14 +43,36 @@ function Recherche() {
 		}
 	, [input]);
 
-	const handleSubmit = (id) => {
-		navigate(`/objet/${id}`);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+	
+		try {
+		  const res = await fetch('http://localhost:3001/api/findObject', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(formData)
+		  });
+	
+		  const data = await res.json();
+	
+		  if (res.ok) {
+			localStorage.setItem('userId', data.objet.idObjetConnecte);
+			navigate('/objet');
+		  } 
+		} catch (err) {
+		  console.error('Erreur côté client :', err);
+		}
 	};
 
 	const handleChange = (e) => {
 		const value = e.target.value;
 		setInput(value);
 		//socket.emit('userInput', value);
+	};
+
+
+	const handleLoad = (e) => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
 	return (
@@ -63,43 +89,38 @@ function Recherche() {
 						className="w-max px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
-				{
-					result && (
-						<p className="mt-4 text-center text-sm text-red-600">
-							{result}
-						</p>
-					)
-				}
 			</div>
-        {input && (
-          <p className="mt-4 text-center text-sm text-red-600">
-            {input}
-          </p>
-        )}
 			<div className="bg-white p-8 rounded-1xl shadow-lg w-full max-w">
 				
 				{result && result.length > 0 && (
 					<div>
 						{result.map(
 							item =>(
-								<>
-									<p
-										className="w-half px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-									>
-										{item.nom}
-									</p>
-									<p
-										className="w-half px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-									>
-									{item.outils}
-									</p>
-									<button
-										type="submit"
-										onClick={() => navigate('/objet')}
-										className="w-max bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-									>
-										Voir l'objet
-									</button>
+								<><form onSubmit={handleSubmit} className="space-y-4">
+								<input
+								  name="nom"
+								  type="text"
+								  placeholder={item.nom}
+								  onChange={handleLoad}
+								  disabled
+								  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								/>
+								<input
+								  name="outils"
+								  type="text"
+								  placeholder={item.outils}
+								  onChange={handleLoad}
+								  disabled
+								  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								/>
+								<button
+									type="submit"
+									onClick={handleSubmit}
+									className="w-max bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+								>
+									Voir l'objet
+								</button>
+							  </form>
 								</>
 							)
 						)}
