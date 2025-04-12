@@ -21,6 +21,7 @@ function Navbar() {
 
       {/* Liens */}
       <div className="space-x-4 text-sm font-medium">
+      <Link to="/recherche" className="text-gray-700 hover:text-blue-600">Recherche</Link>
         <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">Dashboard</Link>
         <Link to="/connexion" className="text-gray-700 hover:text-blue-600">Connexion</Link>
         <Link to="/inscription" className="text-gray-700 hover:text-blue-600">Inscription</Link>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Register from './pages/Register';
 import Login from './pages/Login'; 
 import Dashboard from './pages/Dashboard';
+import Recherche from './pages/Recherche';
 import Navbar from './components/Navbar'; 
 import PrivateRoute from './components/PrivateRoute';
 import AjoutObjets from './components/AjoutObjets';
@@ -30,7 +31,8 @@ function App() {
 
       <Route path="/reset-success" element={<ResetSuccess />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />      
-      <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />                                                                                                                                                                                             
+      <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />      
+      <Route path="/recherche" element={<Recherche />} />                                                                                                                                                                                                           
         <Route path="/inscription" element={<Register />} />
         <Route path="/connexion" element={<Login />} />
         <Route path="/confirmation/:token" element={<Confirmation />} />
