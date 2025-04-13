@@ -10,7 +10,7 @@ function Objet() {
 
 	useEffect(() => {
 		
-		fetch(`http://localhost:3001/api/objet/${objId}`)
+		fetch(`http://localhost:3001/api/recherche/objet/${objId}`)
 		.then((res) => res.json())
 		.then(
 			(data) => {

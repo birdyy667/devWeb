@@ -8,10 +8,6 @@ function Recherche() {
 	const navigate = useNavigate();
 	const [input, setInput] = useState('');
 	const [result, setResult] = useState(null);
-	const [formData, setFormData] = useState({
-		nom: '',
-		outils: ''
-	  });
 
 	/*
 	useEffect(
@@ -43,20 +39,20 @@ function Recherche() {
 		}
 	, [input]);
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async (e, item) => {
 		e.preventDefault();
 	
 		try {
-		  const res = await fetch('http://localhost:3001/api/findObject', {
+		  const res = await fetch('http://localhost:3001/api/recherche/findObject', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(formData)
+			body: JSON.stringify({idObjet : item.idObjetConnecte})
 		  });
 	
 		  const data = await res.json();
 	
 		  if (res.ok) {
-			localStorage.setItem('userId', data.objet.idObjetConnecte);
+			localStorage.setItem('objId', data.objet.id);
 			navigate('/objet');
 		  } 
 		} catch (err) {
@@ -68,11 +64,6 @@ function Recherche() {
 		const value = e.target.value;
 		setInput(value);
 		//socket.emit('userInput', value);
-	};
-
-
-	const handleLoad = (e) => {
-		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
 	return (
@@ -91,32 +82,47 @@ function Recherche() {
 				</div>
 			</div>
 			<div className="bg-white p-8 rounded-1xl shadow-lg w-full max-w">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div>
+						<p className="w-full mt-1 px-3 py-2">Nom</p>
+					</div>
+					<div>
+						<p className="w-full mt-1 px-3 py-2">Outils</p>
+					</div>
+					<div>
+						<p className="w-full mt-1 px-3 py-2">Id</p>
+					</div>
+				</div>
 				
 				{result && result.length > 0 && (
 					<div>
 						{result.map(
 							item =>(
-								<><form onSubmit={handleSubmit} className="space-y-4">
+								<><form onSubmit={(e) => handleSubmit(e, item)} className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<input
 								  name="nom"
 								  type="text"
-								  placeholder={item.nom}
-								  onChange={handleLoad}
-								  disabled
+								  value={item.nom}
+								  readOnly
 								  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 								/>
 								<input
 								  name="outils"
 								  type="text"
-								  placeholder={item.outils}
-								  onChange={handleLoad}
-								  disabled
+								  value={item.outils}
+								  readOnly
+								  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								/>
+								<input
+								  name="nom"
+								  type="text"
+								  value={item.idObjetConnecte}
+								  readOnly
 								  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 								/>
 								<button
 									type="submit"
-									onClick={handleSubmit}
-									className="w-max bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+									className="w-max bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
 								>
 									Voir l'objet
 								</button>
