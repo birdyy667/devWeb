@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Confirmation.css'; // Utilise la classe .animate-wiggle
+import './Confirmation.css'; // Pour l'animation wiggle
 
 function ResetSuccess() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timeout = setTimeout(() => navigate('/connexion'), 4000);
+    // On redirige vers la page d’accueil avec un query param pour forcer l’ouverture de la modale
+    const timeout = setTimeout(() => navigate('/?open=login'), 4000);
     return () => clearTimeout(timeout);
   }, [navigate]);
 
@@ -17,7 +18,7 @@ function ResetSuccess() {
           🎉 Ton mot de passe a été réinitialisé avec succès !
         </p>
         <p className="text-sm text-gray-500">
-          Redirection vers la page de connexion dans quelques secondes...
+          Redirection vers la connexion dans quelques secondes...
         </p>
 
         <div className="flex justify-center mt-4">

@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import ForgotPassword from './ForgotPassword';
 
 function Dashboard() {
   const [utilisateur, setUtilisateur] = useState(null);
   const [message, setMessage] = useState('');
   const [modificationEnCours, setModificationEnCours] = useState(false);
   const [formData, setFormData] = useState({});
-  const navigate = useNavigate();
+  const [showForgotModal, setShowForgotModal] = useState(false);
+
   const userId = localStorage.getItem('userId');
+
+  const getNiveauEtLibelle = (points) => {
+    if (points < 5) return { niveau: 1, libelle: "Débutant" };
+    if (points < 10) return { niveau: 2, libelle: "Intermédiaire" };
+    if (points < 15) return { niveau: 3, libelle: "Confirmé" };
+    return { niveau: 4, libelle: "Expert" };
+  };
 
   useEffect(() => {
     if (!userId) return setMessage("Utilisateur non connecté.");
@@ -36,7 +44,11 @@ function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const dataToSend = new FormData();
-    Object.keys(formData).forEach((key) => dataToSend.append(key, formData[key]));
+    for (const key in formData) {
+      if (formData[key] !== null && formData[key] !== undefined) {
+        dataToSend.append(key, formData[key]);
+      }
+    }
 
     try {
       const res = await fetch(`http://localhost:3001/api/utilisateur/${userId}`, {
@@ -48,7 +60,6 @@ function Dashboard() {
       setMessage(data.message || '✅ Informations mises à jour !');
       setModificationEnCours(false);
 
-      // Refresh user info
       const refreshed = await fetch(`http://localhost:3001/api/utilisateur/${userId}`);
       const newData = await refreshed.json();
       setUtilisateur(newData);
@@ -65,165 +76,185 @@ function Dashboard() {
     );
   }
 
+  const niveauInfo = getNiveauEtLibelle(utilisateur.point);
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
-      <div className="bg-white w-full max-w-5xl shadow-lg rounded-xl flex">
-        {/* Sidebar */}
-        <aside className="w-64 border-r p-6">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-              A
-            </div>
-            <div>
-              <p className="font-bold text-gray-800">{utilisateur.prenom} {utilisateur.nom}</p>
-              <p className="text-sm text-gray-500">{utilisateur.typeMembre}</p>
-            </div>
-          </div>
-        </aside>
+    <div className="min-h-screen bg-gray-100 p-6 flex justify-center font-sans">
+  <div className="bg-white w-full max-w-5xl shadow-lg rounded-xl flex min-h-[calc(100vh-3rem)]">        {/* Sidebar info */}
+  <aside className="w-64 border-r p-6">
+  <div className="flex flex-col items-center space-y-4">
+    {/* Niveau + Libellé sur une ligne */}
+    <div
+      className="flex items-center px-3 py-1 rounded-full text-white text-sm font-medium"
+      style={{
+        backgroundColor:
+          niveauInfo.niveau === 1 ? '#9CA3AF' :
+          niveauInfo.niveau === 2 ? '#3B82F6' :
+          niveauInfo.niveau === 3 ? '#8B5CF6' :
+          '#10B981'
+      }}
+    >
+      {niveauInfo.libelle} <span className="ml-2 font-bold">({niveauInfo.niveau})</span>
+    </div>
 
-        {/* Main content */}
-        <main className="flex-1 p-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Mon compte</h2>
+    {/* Rôle utilisateur */}
+    <p className="text-sm text-gray-500 text-center capitalize">
+      {utilisateur.typeMembre === 'admin' ? 'Administrateur' : 'Membre standard'}
+    </p>
+  </div>
+</aside>
 
-          {message && (
-            <p className="mb-4 text-green-600 font-medium">{message}</p>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex items-center space-x-6">
-              <img
-                src={utilisateur.photo ? `http://localhost:3001/uploads/${utilisateur.photo}` : '/default-avatar.png'}
-                alt="Avatar"
-                className="w-24 h-24 rounded-full object-cover border"
-              />
-              {modificationEnCours && (
-                <input
-                  type="file"
-                  name="photo"
-                  accept="image/*"
-                  onChange={handleChange}
-                  className="text-sm"
-                />
-              )}
-            </div>
+        {/* Main */}
+        <main className="flex-1 p-8 flex flex-col justify-between min-h-[700px]">
+          <div>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              {utilisateur.prenom} {utilisateur.nom}
+            </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Email</label>
-                <input
-                  type="text"
-                  disabled
-                  value={utilisateur.email}
-                  className="w-full mt-1 px-3 py-2 border rounded bg-gray-100"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Nom</label>
-                <input
-                  type="text"
-                  name="nom"
-                  value={formData.nom}
-                  disabled={!modificationEnCours}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Prénom</label>
-                <input
-                  type="text"
-                  name="prenom"
-                  value={formData.prenom}
-                  disabled={!modificationEnCours}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Âge</label>
-                <input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  disabled={!modificationEnCours}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Genre</label>
-                <input
-                  type="text"
-                  name="genre"
-                  value={formData.genre}
-                  disabled={!modificationEnCours}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 font-medium">Date de naissance</label>
-                <input
-                  type="date"
-                  name="dateNaissance"
-                  value={formData.dateNaissance?.substring(0, 10)}
-                  disabled={!modificationEnCours}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 border rounded"
-                />
-              </div>
-            </div>
-
-            {modificationEnCours ? (
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700"
-                >
-                  Sauvegarder
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModificationEnCours(false)}
-                  className="flex-1 bg-gray-500 text-white py-2 rounded"
-                >
-                  Annuler
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setModificationEnCours(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Modifier mes infos
-              </button>
+            {message && (
+              <p className="mb-4 text-green-600 font-medium">{message}</p>
             )}
 
-            <div className="mt-8 text-sm">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="flex items-center space-x-6">
+                <img
+                src={utilisateur.photo ? `http://localhost:3001/uploads/${utilisateur.photo}` : '/logos/photodefault.webp'} alt="Avatar"
+                  className="w-24 h-24 rounded-full object-cover border"
+                />
+                {modificationEnCours && (
+                  <input
+                    type="file"
+                    name="photo"
+                    accept="image/*"
+                    onChange={handleChange}
+                    className="text-sm"
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Email</label>
+                  <input
+                    type="text"
+                    disabled
+                    value={utilisateur.email}
+                    className="w-full mt-1 px-3 py-2 border rounded bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Nom</label>
+                  <input
+                    type="text"
+                    name="nom"
+                    value={formData.nom}
+                    disabled={!modificationEnCours}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Prénom</label>
+                  <input
+                    type="text"
+                    name="prenom"
+                    value={formData.prenom}
+                    disabled={!modificationEnCours}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Âge</label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    disabled={!modificationEnCours}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Genre</label>
+                  <input
+                    type="text"
+                    name="genre"
+                    value={formData.genre}
+                    disabled={!modificationEnCours}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 font-medium">Date de naissance</label>
+                  <input
+                    type="date"
+                    name="dateNaissance"
+                    value={formData.dateNaissance?.substring(0, 10)}
+                    disabled={!modificationEnCours}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Zone d’action alignée en bas */}
+          <div className="flex justify-between items-center pt-12">
+            <div className="text-sm">
               <p className="text-gray-600">Mot de passe oublié ?</p>
               <button
-                onClick={() => navigate('/mot-de-passe-oublie')}
                 type="button"
+                onClick={() => setShowForgotModal(true)}
                 className="text-blue-600 hover:underline font-medium"
               >
                 Réinitialiser mon mot de passe
               </button>
             </div>
 
-            <button
-              onClick={() => {
-                localStorage.removeItem('userId');
-                window.location.href = '/connexion';
-              }}
-              type="button"
-              className="w-full mt-6 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-            >
-              Déconnexion
-            </button>
-          </form>
+            <div>
+              {modificationEnCours ? (
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  >
+                    Sauvegarder
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModificationEnCours(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setModificationEnCours(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Modifier mes infos
+                </button>
+              )}
+            </div>
+          </div>
         </main>
       </div>
+
+      {/* Modal oubli mot de passe */}
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={() => setShowForgotModal(false)}>
+          <div className="bg-white rounded-lg w-full max-w-md p-6 relative" onClick={(e) => e.stopPropagation()}>
+            <ForgotPassword onSuccess={() => setShowForgotModal(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

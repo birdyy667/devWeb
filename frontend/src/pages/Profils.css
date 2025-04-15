@@ -1,0 +1,76 @@
+/* Fiche latérale à droite */
+.sidebar-edit {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    overflow-y: auto;
+    z-index: 50;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  /* Animation d’apparition */
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Champs du formulaire */
+  .sidebar-edit input {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #d1d5db; /* gris clair */
+    border-radius: 0.375rem;
+    font-size: 0.95rem;
+  }
+  
+  /* Boutons */
+  .sidebar-edit .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+  }
+  
+  .sidebar-edit .btn-save {
+    background-color: #10b981; /* vert émeraude */
+    color: white;
+    margin-right: 0.5rem;
+  }
+  
+  .sidebar-edit .btn-save:hover {
+    background-color: #059669;
+  }
+  
+  .sidebar-edit .btn-cancel {
+    background: none;
+    color: #6b7280;
+    text-decoration: underline;
+  }
+  
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0%);
+    }
+  }
+  
+  .animate-slideIn {
+    animation: slideIn 0.3s ease-out forwards;
+  }
+  
