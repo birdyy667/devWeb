@@ -57,6 +57,13 @@ node index.js
 cd frontend
 npm run dev
 ```
+
+### 7. Lancer le site
+
+> Ecrire dans la barre de recherche d'un navigateur
+```bash
+localhost:5173
+```
 ---
 
 ## ✨ Fonctionnalités développées
