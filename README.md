@@ -1,134 +1,95 @@
-# devWeb
+# Projet Accessly - Centre Commercial Connecté
 
+Bienvenue dans le projet **Accessly**, une plateforme web de gestion d’objets connectés pour un centre commercial. Ce projet a été réalisé dans le cadre de notre formation en développement web.
 
+## 🚀 Lancer le site en local
 
-# 🏢 Plateforme intelligente – Centre Commercial Connecté
+### 1. Prérequis
+- Node.js (v18 recommandé)
+- MySQL (serveur local configuré)
 
-Projet web fullstack permettant la gestion de comptes utilisateurs, d’objets connectés et de plateformes dans un environnement type centre commercial.
+### 2. Initialisation de la base de données
+1. Créer une base `centreCommerciale` dans MySQL
+2. Importer le fichier `CentreCommerciale.sql` situé dans le dossier `backend`
+3. Lancer MySQL et taper la commande :
+   ```bash
+   source /chemin/vers/backend/CentreCommerciale.sql
+   ```
 
----
-
-## 📁 Architecture du projet
-
-```
-Projet/
-├── backend/
-│   ├── config/              # Configuration de la base de données
-│   ├── routes/              # Routes Express : utilisateurs (register, login, etc.)
-│   ├── database/            # Fichier .sql et README pour la base de données
-│   ├── index.js             # Serveur Express principal
-│   ├── package.json         # Dépendances backend
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/           # Pages React : Register, Login, Dashboard
-│   │   ├── components/      # Navbar, PrivateRoute (routes protégées)
-│   ├── public/
-│   ├── index.html
-│   ├── App.jsx              # Définition des routes React
-│   ├── vite.config.js       # Config Vite
-│   ├── package.json         # Dépendances frontend
-```
-
----
-
-## ⚙️ Frameworks & outils utilisés
-
-| Partie       | Technologies utilisées                      |
-|--------------|----------------------------------------------|
-| Base de données | MySQL (dump SQL fourni)                   |
-| Backend      | Node.js, Express, mysql2, cors               |
-| Frontend     | React, React Router, Vite                    |
-| Auth simple  | localStorage (userId)                        |
-| Tests API    | Postman                                      |
-| Dev Tools    | VSCode, Git, GitHub                          |
-
----
-
-## 🚀 Lancer le projet localement
-
-### 📦 Backend (API Express)
+### 3. Lancer le backend (Express)
 ```bash
 cd backend
 npm install
 node index.js
 ```
-→ Le backend démarre sur : `http://localhost:3001`
+> Le serveur Express tourne sur http://localhost:3001
 
----
-
-### 🌐 Frontend (React)
+### 4. Lancer le frontend (React)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-→ Le frontend démarre sur : `http://localhost:5173`
+> Le frontend tourne sur http://localhost:5173
+
+## 💡 Fonctionnalités disponibles
+
+### 🔑 Authentification
+- Inscription avec confirmation par email
+- Connexion
+- Réinitialisation de mot de passe
+- Accès restreint via `PrivateRoute`
+
+### 🌐 Landing Page
+- Page d'accueil esthétique avec vidéo de fond et boutons d'accès
+
+### 🔹 Dashboard
+- Vue d'ensemble des informations utilisateur et de l’activité
+
+### 👥 Profils Publics
+- Liste de tous les utilisateurs (informations publiques)
+- Barre de recherche et filtrage
+- Pour les administrateurs :
+  - Modification inline des profils
+  - Suppression des utilisateurs
+  - Création de nouveaux utilisateurs
+
+### 💡 Objets Connectés
+- Affichage des objets connectés
+- Recherche par nom ou type
+- Suggestion d'ajout d’objets (niveau 3)
+- Ajout direct d'objets (admin / niveau 4)
+- Modification des paramètres techniques dynamiques selon le type
+- Suppression d’objets par les admins
+
+### 📄 Page de validation
+- Affichage des objets à valider
+- Acceptation ou refus des suggestions d’ajout
+- Notification visible pour les admins dans la sidebar
+
+### 📊 Rapport
+- Graphiques adaptés aux données de chaque objet (temps réel)
+- Historique des valeurs collectées
+- Nom et prénom de l'utilisateur ayant effectué la dernière mise à jour
+- Message intelligent de situation (par ex : “Tout est normal” ou “Attention à la tension”)
+
+## ⚙️ Structure technique
+- Frontend : React + Tailwind CSS + React Router
+- Backend : Express + MySQL
+- Authentification par token email + stockage local
+- Upload de photo via `multer`
+
+## ✅ Statuts d'utilisateur
+- **Visiteur** : accès à la landing page uniquement
+- **Niveau 1-2** : accès limité à la consultation des objets
+- **Niveau 3** : peut suggérer des objets
+- **Niveau 4 (Admin)** : créer, modifier, valider, supprimer tout contenu
 
 ---
 
-## 🗃️ Importer la base de données
-
-Le fichier `centreCommerciale.sql` se trouve dans `backend/database/`.
-
-### Étapes :
-1. Ouvrir un terminal
-2. Lancer MySQL :
-   ```bash
-   mysql -u root -p
-   ```
-3. Créer la base :
-   ```sql
-   CREATE DATABASE IF NOT EXISTS centreCommerciale;
-   EXIT;
-   ```
-4. Importer le fichier SQL :
-   ```bash
-   mysql -u root -p centreCommerciale < backend/database/centreCommerciale.sql
-   ```
+> Ce projet a été réalisé en équipe dans un cadre pédagogique. Merci de ne pas écraser les fichiers sans avoir vérifié l'historique Git !
 
 ---
 
-## 🔑 Fonctionnalités déjà prêtes
+Contact : [Votre nom ou email facultatif ici]
 
-- ✅ Inscription (`/inscription`)
-- ✅ Connexion (`/connexion`)
-- ✅ Dashboard utilisateur (`/dashboard`)
-- ✅ Déconnexion
-- ✅ Protection des routes (PrivateRoute)
-- ✅ Affichage dynamique des infos de l’utilisateur connecté
-- ✅ Système de rôles (`client`, `commerçant`, `admin`)
-
----
-
-## 📌 Ce qu’il faut savoir pour coder efficacement
-
-### 🔧 Backend
-
-- Fichier principal : `index.js`
-- Routes API disponibles dans `routes/utilisateurs.js`
-- Utilisation de `mysql2` pour interroger la base
-- Pour créer une nouvelle route : ajouter dans `routes/`, puis importer dans `index.js`
-
-### 🎨 Frontend
-
-- React avec Vite (rapide pour le dev)
-- Les pages sont dans `src/pages`
-- La navigation est gérée avec `react-router-dom`
-- L’authentification est très simple : on stocke l’`userId` dans `localStorage`
-- Le composant `PrivateRoute` empêche l’accès au dashboard si l’utilisateur n’est pas connecté
-
-### 📦 Pour ajouter une page :
-1. Créer un fichier dans `pages/` (ex: `Profil.jsx`)
-2. L’ajouter dans `App.jsx` avec un `<Route />`
-
-
----
-
-## 🤝 Collaboration
-
-- Chacun peut cloner le repo, lancer le projet localement et travailler dans une branche
-- Pour push, utilisez votre propre token GitHub
-- Demandez à être ajouté en **collaborateur** si vous ne pouvez pas pousser
-
----
