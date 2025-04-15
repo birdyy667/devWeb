@@ -2,6 +2,45 @@
 
 Bienvenue dans le projet **Accessly**, une plateforme web de gestion d’objets connectés pour un centre commercial. Ce projet a été réalisé dans le cadre de notre formation en développement web.
 
+
+## 🔧 Configuration de la base de données (fichier db.js)
+
+Avant de lancer le backend, vous devez configurer la connexion MySQL dans le fichier backend/config/db.js.
+Ce fichier permet à l'application Node.js de se connecter à votre base de données centreCommerciale.
+
+// backend/config/db.js
+
+const mysql = require('mysql2');
+
+const db = mysql.createConnection({
+  host: 'localhost',           // Ne rien changer si vous êtes en local
+  user: 'devweb',              // 👉 Remplacez par votre identifiant MySQL
+  password: '1234',            // 👉 Remplacez par votre mot de passe MySQL
+  database: 'centreCommerciale' // Assurez-vous que la base existe
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error('❌ Erreur de connexion MySQL :', err);
+  } else {
+    console.log('✅ Connecté à MySQL');
+  }
+});
+
+module.exports = db;
+
+✅ Exemple
+
+Si votre nom d'utilisateur est root et que vous n'avez pas mis de mot de passe :
+
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'centreCommerciale'
+});
+
+
 ## 🚀 Lancer le site en local
 
 ### 1. Prérequis
