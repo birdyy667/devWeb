@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 
-
 // Configuration de multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
@@ -39,7 +38,6 @@ router.post('/register', upload.single('photo'), (req, res) => {
     age,
     genre,
     dateNaissance,
-    point,
     idStatut,
     idEmplacement,
     idPlateforme
@@ -73,6 +71,8 @@ router.post('/register', upload.single('photo'), (req, res) => {
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
+
+
 const valeurs = [
   email,
   motDePasse,
@@ -83,13 +83,16 @@ const valeurs = [
   age,
   genre,
   dateNaissance,
-  point,
+  1, // 1 point à l'inscription
   idStatut,
   idEmplacement,
   idPlateforme,
   tokenValidation,
   expirationToken
 ];
+
+console.log("🧪 Données envoyées à l'inscription :", valeurs);
+
 
 
 const transporter = nodemailer.createTransport({
@@ -135,7 +138,7 @@ transporter.sendMail(mailOptions, (err, info) => {
   });
 });
 
-// Route PUT : mise à jour des infos utilisateur (sauf email et mot de passe)
+
 router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
   const id = req.params.id;
   const {
@@ -143,7 +146,9 @@ router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
     prenom,
     age,
     genre,
-    dateNaissance
+    dateNaissance,
+    motDePasse,
+    point
   } = req.body;
 
   const photo = req.file ? req.file.filename : null;
@@ -168,11 +173,21 @@ router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
     valeurs.push(genre);
   }
 
-  // ✅ Vérification et formatage de la date
+  if (typeof motDePasse === 'string' && motDePasse.trim() !== '') {
+    champs.push("motDePasse = ?");
+    valeurs.push(motDePasse.trim());
+  }
+
+  const parsedPoint = parseInt(point);
+  if (!isNaN(parsedPoint)) {
+    champs.push("point = ?");
+    valeurs.push(parsedPoint);
+  }
+
   if (dateNaissance) {
     const dateObj = new Date(dateNaissance);
     if (!isNaN(dateObj.getTime())) {
-      const formattedDate = dateObj.toISOString().slice(0, 10); // YYYY-MM-DD
+      const formattedDate = dateObj.toISOString().slice(0, 10);
       champs.push("dateNaissance = ?");
       valeurs.push(formattedDate);
     } else {
@@ -196,6 +211,11 @@ router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
   `;
   valeurs.push(id);
 
+  // ✅ Logs déplacés ici
+  console.log("🧪 Données reçues :", req.body);
+  console.log("🧾 SQL:", sql);
+  console.log("📦 Valeurs:", valeurs);
+
   db.query(sql, valeurs, (err, result) => {
     if (err) {
       console.error("❌ Erreur SQL (update) :", err);
@@ -205,6 +225,9 @@ router.put('/utilisateur/:id', upload.single('photo'), (req, res) => {
     res.status(200).json({ message: "✅ Profil mis à jour avec succès" });
   });
 });
+
+
+
 
 // Route POST : demande de réinitialisation de mot de passe
 router.post('/forgot-password', (req, res) => {
@@ -301,32 +324,44 @@ router.put('/reset-password/:token', (req, res) => {
 module.exports = router;
 
 
-// Route POST : connexion utilisateur
 router.post('/login', (req, res) => {
-    const { email, motDePasse } = req.body;
-  
-    if (!email || !motDePasse) {
-      return res.status(400).json({ error: 'Email et mot de passe obligatoires' });
-    }
-  
-    const sql = `
-      SELECT * FROM utilisateur WHERE email = ? AND motDePasse = ?
-    `;
-  
-    db.query(sql, [email, motDePasse], (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-  
-      if (results.length === 0) {
-        return res.status(401).json({ error: 'Identifiants incorrects' });
-      }
-  
-      const utilisateur = results[0];
+  const { email, motDePasse } = req.body;
 
-      if (utilisateur.estVerifie !== 1) {
-        return res.status(403).json({
-          error: "Veuillez confirmer votre adresse email avant de vous connecter."
-        });
+  if (!email || !motDePasse) {
+    return res.status(400).json({ error: 'Email et mot de passe obligatoires' });
+  }
+
+  const sql = `
+    SELECT * FROM utilisateur WHERE email = ? AND motDePasse = ?
+  `;
+
+  db.query(sql, [email, motDePasse], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Identifiants incorrects' });
+    }
+
+    const utilisateur = results[0];
+
+    if (utilisateur.estVerifie !== 1) {
+      return res.status(403).json({
+        error: "Veuillez confirmer votre adresse email avant de vous connecter."
+      });
+    }
+
+    // ✅ Incrémentation des points de 1
+    const updatePoints = `
+      UPDATE utilisateur SET point = point + 1 WHERE idUtilisateur = ?
+    `;
+
+    db.query(updatePoints, [utilisateur.idUtilisateur], (updateErr) => {
+      if (updateErr) {
+        console.error("❌ Erreur lors de la mise à jour des points :", updateErr);
+        return res.status(500).json({ error: "Erreur interne (points)" });
       }
+
+      // ✅ Réponse finale avec succès
       res.status(200).json({
         message: 'Connexion réussie ✅',
         utilisateur: {
@@ -338,6 +373,8 @@ router.post('/login', (req, res) => {
       });
     });
   });
+});
+
 
   //ROUT Post re-innitialisation mot de passe
   
@@ -406,26 +443,46 @@ router.post('/login', (req, res) => {
   
   
 
+// Obtenir les infos publiques de tous les utilisateurs (niveau visible par tous, détails visibles par admin)
+router.get('/profils-publics', (req, res) => {
+  const sql = `
+    SELECT idUtilisateur, prenom, nom, email, age, genre, photo, typeMembre, estVerifie, point, idStatut
+    FROM utilisateur
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("❌ Erreur SQL :", err);
+      return res.status(500).json({ error: "Erreur serveur" });
+    }
+
+    res.json(result);
+  });
+});
+
+
+
 // Route GET : infos d'un utilisateur par son ID
 router.get('/utilisateur/:id', (req, res) => {
-    const userId = req.params.id;
-  
-    const sql = `
-      SELECT idUtilisateur, email, age, genre, dateNaissance, typeMembre, photo, nom, prenom
-      FROM utilisateur
-      WHERE idUtilisateur = ?
-    `;
-  
-    db.query(sql, [userId], (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-  
-      if (results.length === 0) {
-        return res.status(404).json({ error: 'Utilisateur non trouvé' });
-      }
-  
-      res.json(results[0]);
-    });
+  const userId = req.params.id;
+
+  const sql = `
+    SELECT idUtilisateur, email, age, genre, dateNaissance, typeMembre, photo, nom, prenom, point
+    FROM utilisateur
+    WHERE idUtilisateur = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    res.json(results[0]);
   });
+});
+
 
   // Route GET : confirmation d'inscription par token
   router.get('/confirmation/:token', (req, res) => {
@@ -466,6 +523,28 @@ router.get('/utilisateur/:id', (req, res) => {
   
         console.log("🛠️ Résultat UPDATE :", result2);
         res.status(200).json({ message: "✅ Compte activé avec succès !" });
+      });
+    });
+  });
+
+  router.delete('/utilisateur/:id', (req, res) => {
+    const id = req.params.id;
+  
+    // Requête pour vérifier si l'utilisateur à supprimer est un admin
+    const checkAdmin = `SELECT typeMembre FROM utilisateur WHERE idUtilisateur = ?`;
+  
+    db.query(checkAdmin, [id], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Erreur SQL' });
+      if (result.length === 0) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  
+      if (result[0].typeMembre === 'admin') {
+        return res.status(403).json({ error: 'Impossible de supprimer un admin' });
+      }
+  
+      const sql = `DELETE FROM utilisateur WHERE idUtilisateur = ?`;
+      db.query(sql, [id], (err2) => {
+        if (err2) return res.status(500).json({ error: 'Erreur lors de la suppression' });
+        res.status(200).json({ message: 'Utilisateur supprimé avec succès' });
       });
     });
   });
