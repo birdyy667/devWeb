@@ -1,134 +1,133 @@
-# devWeb
+# 🏬 Accessly – Plateforme de gestion de centre commercial
 
-
-
-# 🏢 Plateforme intelligente – Centre Commercial Connecté
-
-Projet web fullstack permettant la gestion de comptes utilisateurs, d’objets connectés et de plateformes dans un environnement type centre commercial.
+Bienvenue sur **Accessly**, une plateforme intelligente de gestion d'un centre commercial, développée dans le cadre du projet de développement web à CY Tech.
 
 ---
 
-## 📁 Architecture du projet
+## 🚀 Lancer le projet en local
 
-```
-Projet/
-├── backend/
-│   ├── config/              # Configuration de la base de données
-│   ├── routes/              # Routes Express : utilisateurs (register, login, etc.)
-│   ├── database/            # Fichier .sql et README pour la base de données
-│   ├── index.js             # Serveur Express principal
-│   ├── package.json         # Dépendances backend
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/           # Pages React : Register, Login, Dashboard
-│   │   ├── components/      # Navbar, PrivateRoute (routes protégées)
-│   ├── public/
-│   ├── index.html
-│   ├── App.jsx              # Définition des routes React
-│   ├── vite.config.js       # Config Vite
-│   ├── package.json         # Dépendances frontend
+### 1. Cloner le dépôt
+```bash
+git clone https://github.com/birdyy667/devWeb.git
+cd devWeb
 ```
 
----
+### 2. Initialiser la base de données
+- Ouvrir **MySQL Workbench** ou votre terminal MySQL
+- Importer le fichier : `backend/centreCommerciale_dump.sql`
+- Cela créera la base `centreCommerciale` avec toutes les tables nécessaires
 
-## ⚙️ Frameworks & outils utilisés
+### 3. Configurer la connexion MySQL
 
-| Partie       | Technologies utilisées                      |
-|--------------|----------------------------------------------|
-| Base de données | MySQL (dump SQL fourni)                   |
-| Backend      | Node.js, Express, mysql2, cors               |
-| Frontend     | React, React Router, Vite                    |
-| Auth simple  | localStorage (userId)                        |
-| Tests API    | Postman                                      |
-| Dev Tools    | VSCode, Git, GitHub                          |
+> Modifiez le fichier `backend/config/db.js` en fonction de vos identifiants locaux :
 
----
+```js
+const mysql = require('mysql2');
 
-## 🚀 Lancer le projet localement
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'votre_user_mysql',       // 👉 à modifier
+  password: 'votre_mot_de_passe', // 👉 à modifier
+  database: 'centreCommerciale'
+});
 
-### 📦 Backend (API Express)
+module.exports = db;
+```
+
+> Exemple si vous utilisez MySQL avec root et pas de mot de passe :
+```js
+user: 'root',
+password: '',
+```
+
+### 4. Installer les dépendances
+```bash
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+### 5. Lancer le serveur backend
 ```bash
 cd backend
-npm install
 node index.js
 ```
-→ Le backend démarre sur : `http://localhost:3001`
 
----
-
-### 🌐 Frontend (React)
+### 6. Lancer le frontend
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
-→ Le frontend démarre sur : `http://localhost:5173`
+---
+
+## ✨ Fonctionnalités développées
+
+### ✅ Authentification
+- Création de compte avec vérification par email
+- Connexion / Déconnexion
+- Réinitialisation de mot de passe avec token sécurisé
+
+### ✅ Dashboard personnalisé
+- Données affichées selon le type d’utilisateur (admin ou standard)
+
+### ✅ Gestion des utilisateurs
+- Chaque utilisateur a un niveau selon ses points (connexion, interaction)
+- Système d’administration (les admins peuvent modifier ou supprimer des profils)
+
+### ✅ Gestion des objets connectés
+- Ajout d’objets avec image, type, description, emplacement
+- Visualisation en grille avec recherche
+- Modification inline des paramètres (température, luminosité, etc.)
+- Validation des propositions par les administrateurs
+- Formulaire d’ajout dans une sidebar moderne
+
+### ✅ Données dynamiques
+- Chaque type d’objet possède ses propres paramètres (thermostat, caméra, lumière, etc.)
+- Données enregistrées dans un historique
+- Graphiques d’évolution visibles dans l’onglet **Rapport**
+
+### ✅ Système de rôles et permissions
+- Niveau 1 : lecture seule
+- Niveau 2 : recherche et suggestion
+- Niveau 3 : suggestion d’objet
+- Niveau 4 (admin) : création, modification, validation, suppression
+
+### ✅ Interface
+- Sidebar fixe et moderne
+- Page d’accueil animée avec vidéo (LandingPage)
+- Modales pour l’inscription et la connexion
 
 ---
 
-## 🗃️ Importer la base de données
-
-Le fichier `centreCommerciale.sql` se trouve dans `backend/database/`.
-
-### Étapes :
-1. Ouvrir un terminal
-2. Lancer MySQL :
-   ```bash
-   mysql -u root -p
-   ```
-3. Créer la base :
-   ```sql
-   CREATE DATABASE IF NOT EXISTS centreCommerciale;
-   EXIT;
-   ```
-4. Importer le fichier SQL :
-   ```bash
-   mysql -u root -p centreCommerciale < backend/database/centreCommerciale.sql
-   ```
+## 🔐 Sécurité
+- Jetons de confirmation et de réinitialisation de mot de passe
+- Middleware de route privée pour bloquer l’accès sans login
 
 ---
 
-## 🔑 Fonctionnalités déjà prêtes
+## 📁 Arborescence simplifiée
 
-- ✅ Inscription (`/inscription`)
-- ✅ Connexion (`/connexion`)
-- ✅ Dashboard utilisateur (`/dashboard`)
-- ✅ Déconnexion
-- ✅ Protection des routes (PrivateRoute)
-- ✅ Affichage dynamique des infos de l’utilisateur connecté
-- ✅ Système de rôles (`client`, `commerçant`, `admin`)
-
----
-
-## 📌 Ce qu’il faut savoir pour coder efficacement
-
-### 🔧 Backend
-
-- Fichier principal : `index.js`
-- Routes API disponibles dans `routes/utilisateurs.js`
-- Utilisation de `mysql2` pour interroger la base
-- Pour créer une nouvelle route : ajouter dans `routes/`, puis importer dans `index.js`
-
-### 🎨 Frontend
-
-- React avec Vite (rapide pour le dev)
-- Les pages sont dans `src/pages`
-- La navigation est gérée avec `react-router-dom`
-- L’authentification est très simple : on stocke l’`userId` dans `localStorage`
-- Le composant `PrivateRoute` empêche l’accès au dashboard si l’utilisateur n’est pas connecté
-
-### 📦 Pour ajouter une page :
-1. Créer un fichier dans `pages/` (ex: `Profil.jsx`)
-2. L’ajouter dans `App.jsx` avec un `<Route />`
-
+```
+├── backend
+│   ├── config/db.js
+│   ├── routes/*.js
+│   └── centreCommerciale_dump.sql
+├── frontend
+│   ├── src/components
+│   ├── src/pages
+│   ├── src/layouts
+│   └── src/App.jsx
+```
 
 ---
 
-## 🤝 Collaboration
-
-- Chacun peut cloner le repo, lancer le projet localement et travailler dans une branche
-- Pour push, utilisez votre propre token GitHub
-- Demandez à être ajouté en **collaborateur** si vous ne pouvez pas pousser
+## 👨‍💻 Développé avec :
+- Node.js + Express
+- React + Vite
+- MySQL
+- Tailwind CSS
 
 ---
+
+## ✍️ Auteurs
+Projet réalisé dans le cadre du module Développement Web à CY Tech (ING1).
+
