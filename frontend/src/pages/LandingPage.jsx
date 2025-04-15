@@ -150,7 +150,7 @@ function LandingPage() {
     >
       <Register onSuccess={() => {
         setShowRegisterModal(false);
-        window.location.href = "/dashboard";
+        setShowLoginModal(true);
       }} 
         onSwitch={() => {
             setShowRegisterModal(false);

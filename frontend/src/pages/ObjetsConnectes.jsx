@@ -315,9 +315,9 @@ function ObjetsConnectes() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg"
           >
-            ✅ Ajouter l'objet
+            Ajouter l'objet
           </button>
         </div>
       </form>
@@ -331,20 +331,16 @@ function ObjetsConnectes() {
           <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-40" onClick={() => setEditionOuverte(false)} />
           <div className="fixed top-0 right-0 w-full sm:w-[900px] h-full bg-gray-900 text-white z-50 p-8 overflow-y-auto animate-slideIn">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-white">{objetEnCours?.nom}</h2>
             </div>
 
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <img src={getPhotoPath(objetEnCours?.typeObjet)} alt={objetEnCours?.typeObjet} className="w-full rounded-lg shadow border" />
-              </div>
-              <div className="text-sm space-y-2">
-                <p><strong>Type :</strong> {objetEnCours?.typeObjet}</p>
-                <p><strong>Description :</strong> {objetEnCours?.description}</p>
-                <p><strong>Emplacement :</strong> {objetEnCours?.emplacement}</p>
-                <p><strong>Base :</strong> {objetEnCours?.nomBase}</p>
-                <p><strong>ID :</strong> {objetEnCours?.idObjetConnecte}</p>
-              </div>
+            <div className="text-center flex flex-col items-center mb-6">
+              <img
+                src={getPhotoPath(objetEnCours?.typeObjet)}
+                alt={objetEnCours?.typeObjet}
+                className="w-40 h-40 object-cover rounded-full shadow mb-4"
+              />
+              <h2 className="text-3xl font-bold text-gray-800 mb-1">{objetEnCours?.nom}</h2>
+              <p className="text-gray-600 italic">{objetEnCours?.description}</p>
             </div>
 
             <div className="mt-10 grid grid-cols-2 gap-6">
@@ -528,13 +524,13 @@ function ObjetsConnectes() {
                   </div>
                 ))}
                 <div className="mt-6 col-span-2 flex justify-end">
-  <button
-    onClick={() => handleUpdate(objetEnCours?.idObjetConnecte)}
-    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow"
-  >
-    ✅ Enregistrer les modifications
-  </button>
-</div>
+                <button
+                  onClick={() => handleUpdate(objetEnCours?.idObjetConnecte)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow"
+                >
+                  Enregistrer la configuration
+                </button>
+              </div>  
 
 
             </div>
@@ -561,7 +557,7 @@ function ObjetsConnectes() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.536-6.536a2 2 0 112.828 2.828L11.828 15H9v-2z" />
                     </svg>
-                    Modifier
+                    Configurer
                   </button>
 
                   {niveau === 4 && (

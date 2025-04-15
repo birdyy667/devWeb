@@ -1,46 +1,40 @@
-// src/components/Sidebar.jsx
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 
-function Sidebar() {
+function Navbar() {
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isLoggedIn = !!localStorage.getItem('userId');
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
-
-      const res = await fetch(`http://localhost:3001/api/utilisateur/${userId}`);
-      const data = await res.json();
-      setIsAdmin(data.utilisateur?.statut === "admin");
-    };
-    fetchUser();
-  }, []);
-
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem('userId');
-    navigate('/');
+    navigate('/connexion');
   };
 
   return (
-    <div className="bg-white shadow h-screen w-60 fixed left-0 top-0 flex flex-col px-6 py-8">
-      <div className="flex items-center space-x-2 mb-8">
-        <div className="bg-blue-600 w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold">A</div>
-        <span className="text-lg font-semibold text-gray-800">Accessly</span>
-      </div>
+    <nav className="bg-white shadow-md py-3 px-6 flex items-center justify-between">
+      {/* Logo */}
+      <Link to="/" className="flex items-center">
+        <div className="bg-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+          <span className="text-white font-bold text-md">A</span>
+        </div>
+        <span className="text-xl font-semibold text-gray-700">Accessly</span>
+      </Link>
 
-      <nav className="flex flex-col space-y-4 text-sm font-medium text-gray-700">
-        <Link to="/dashboard" className="hover:text-blue-600">🏠 Dashboard</Link>
-        <Link to="/profils" className="hover:text-blue-600">👥 Profils publics</Link>
-        <Link to="/objets-connectes" className="hover:text-blue-600">🧠 Objets connectés</Link>
-        {isAdmin && (
-          <Link to="/valider-objets" className="hover:text-blue-600">✅ Objets à valider</Link>
+      {/* Liens */}
+      <div className="space-x-4 text-sm font-medium">
+        <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">Dashboard</Link>
+        <Link to="/connexion" className="text-gray-700 hover:text-blue-600">Connexion</Link>
+        <Link to="/inscription" className="text-gray-700 hover:text-blue-600">Inscription</Link>
+        {isLoggedIn && (
+          <button
+            onClick={handleLogout}
+            className="text-red-600 hover:text-red-700 ml-2"
+          >
+            Déconnexion
+          </button>
         )}
-        <button onClick={logout} className="text-red-600 hover:text-red-700 mt-6 text-left">🚪 Déconnexion</button>
-      </nav>
-    </div>
+      </div>
+    </nav>
   );
 }
 
-export default Sidebar;
+export default Navbar;

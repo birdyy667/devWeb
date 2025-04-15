@@ -8,17 +8,25 @@ function Confirmation() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    // ⛔ Masquer la sidebar si elle est présente
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar) sidebar.style.display = "none";
+
     fetch(`http://localhost:3001/api/confirmation/${token}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.message?.includes("activé")) {
           setStatus('success');
           setMessage("🎉 Ton adresse email a bien été confirmée !");
-          setTimeout(() => navigate('/connexion'), 4000);
+          setTimeout(() => {
+            window.location.href = "/?open=login"; // ✅ redirection landing + login
+          }, 4000);
         } else if (data.error === "Lien invalide ou expiré") {
           setStatus('alreadyUsed');
           setMessage("✅ Ton email est probablement déjà confirmé.");
-          setTimeout(() => navigate('/connexion'), 4000);
+          setTimeout(() => {
+            window.location.href = "/?open=login"; // ✅ même redirection
+          }, 4000);
         } else {
           setStatus('error');
           setMessage(data.error || "❌ Une erreur s’est produite.");
@@ -28,7 +36,12 @@ function Confirmation() {
         setStatus('error');
         setMessage("❌ Erreur de connexion au serveur.");
       });
-  }, [token, navigate]);
+
+    // 🧼 Remettre la sidebar visible en cas de retour
+    return () => {
+      if (sidebar) sidebar.style.display = "";
+    };
+  }, [token]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -53,14 +66,13 @@ function Confirmation() {
 
         {status === 'error' && (
           <button
-            onClick={() => navigate('/connexion')}
+            onClick={() => window.location.href = "/?open=login"}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
           >
             Retour à la connexion
           </button>
         )}
 
-        {/* Logo animé */}
         <div className="mt-6 flex justify-center">
           <div className="text-4xl font-bold text-blue-600 animate-bounce">
             A

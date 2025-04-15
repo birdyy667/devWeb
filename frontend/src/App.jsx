@@ -21,6 +21,7 @@ import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import PrivateLayout from './layouts/PrivateLayout';
 
+
 function AppWrapper() {
   const location = useLocation();
   const hideLayout = ["/", "/connexion", "/inscription"].includes(location.pathname);
@@ -46,6 +47,7 @@ function AppWrapper() {
         <Route path="/valider-objets" element={<PrivateRoute><PrivateLayout><ValiderObjets /></PrivateLayout></PrivateRoute>} />
         <Route path="/rapport" element={<PrivateRoute><PrivateLayout><Rapport /></PrivateLayout></PrivateRoute>} />
         <Route path="/gestion-objets" element={<PrivateRoute><PrivateLayout><GestionObjets /></PrivateLayout></PrivateRoute>} />
+
       </Routes>
     </>
   );
