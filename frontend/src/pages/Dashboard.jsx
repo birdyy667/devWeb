@@ -235,12 +235,16 @@ function Dashboard() {
                 </div>
               ) : (
                 <button
-                  type="button"
-                  onClick={() => setModificationEnCours(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Modifier mes infos
-                </button>
+                    type="button"
+                    onClick={() => setModificationEnCours(true)}
+                    className="text-blue-600 text-sm hover:underline flex items-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.536-6.536a2 2 0 112.828 2.828L11.828 15H9v-2z" />
+                    </svg>
+                    Modifier mes infos
+              </button>
+
               )}
             </div>
           </div>

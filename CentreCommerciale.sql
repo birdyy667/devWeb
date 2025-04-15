@@ -42,6 +42,70 @@ INSERT INTO `base_donnees_associee` VALUES (1,'Alarme intrusion','Nombre de fois
 UNLOCK TABLES;
 
 --
+-- Table structure for table `camera_connectee`
+--
+
+DROP TABLE IF EXISTS `camera_connectee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `camera_connectee` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idObjetConnecte` int NOT NULL,
+  `resolution` varchar(20) DEFAULT NULL,
+  `vision_nuit` tinyint(1) DEFAULT NULL,
+  `derniere_detection` datetime DEFAULT NULL,
+  `etat_enregistrement` varchar(50) DEFAULT NULL,
+  `stockage_disponible` varchar(10) DEFAULT NULL,
+  `emplacement` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idObjetConnecte` (`idObjetConnecte`),
+  CONSTRAINT `camera_connectee_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `camera_connectee`
+--
+
+LOCK TABLES `camera_connectee` WRITE;
+/*!40000 ALTER TABLE `camera_connectee` DISABLE KEYS */;
+INSERT INTO `camera_connectee` VALUES (2,13,'1080p',1,'2025-04-14 21:30:11','actif','75%','Entrée Est');
+/*!40000 ALTER TABLE `camera_connectee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `compteur_electrique`
+--
+
+DROP TABLE IF EXISTS `compteur_electrique`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `compteur_electrique` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idObjetConnecte` int NOT NULL,
+  `courant` varchar(10) DEFAULT NULL,
+  `tension` varchar(10) DEFAULT NULL,
+  `consommation_totale_kWh` decimal(10,2) DEFAULT NULL,
+  `consommation_journaliere_kWh` decimal(10,2) DEFAULT NULL,
+  `derniere_releve` datetime DEFAULT NULL,
+  `emplacement` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idObjetConnecte` (`idObjetConnecte`),
+  CONSTRAINT `compteur_electrique_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `compteur_electrique`
+--
+
+LOCK TABLES `compteur_electrique` WRITE;
+/*!40000 ALTER TABLE `compteur_electrique` DISABLE KEYS */;
+INSERT INTO `compteur_electrique` VALUES (2,15,'15A','230V',42300.75,102.50,'2025-04-14 21:30:11','Local technique A');
+/*!40000 ALTER TABLE `compteur_electrique` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `donnees_objet`
 --
 
@@ -56,7 +120,7 @@ CREATE TABLE `donnees_objet` (
   PRIMARY KEY (`idDonnee`),
   KEY `idObjetConnecte` (`idObjetConnecte`),
   CONSTRAINT `donnees_objet_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,7 +129,40 @@ CREATE TABLE `donnees_objet` (
 
 LOCK TABLES `donnees_objet` WRITE;
 /*!40000 ALTER TABLE `donnees_objet` DISABLE KEYS */;
+INSERT INTO `donnees_objet` VALUES (1,12,'2025-04-15 14:47:02','{\"etat\": \"arrêt\", \"mode\": \"auto\", \"sens\": \"descente\", \"courant\": 5, \"tension\": 220, \"luminosite\": 50, \"resolution\": \"1080p\", \"emplacement\": \"Entrée principale\", \"vitesse_m_s\": \"1\", \"temperature_cible\": 20, \"maintenance_prevue\": \"3 mois+\", \"derniere_inspection\": \"3 mois+\"}'),(2,14,'2025-04-15 14:45:02','{\"etat\": \"arrêt\", \"mode\": \"manuel\", \"sens\": \"montée\", \"courant\": 5, \"tension\": 220, \"luminosite\": \"0\", \"resolution\": \"1080p\", \"emplacement\": \"Galerie centrale\", \"vitesse_m_s\": 1.5, \"temperature_cible\": 20, \"maintenance_prevue\": \"2 mois\", \"derniere_inspection\": \"1 mois\"}'),(3,15,'2025-04-15 14:46:32','{\"etat\": \"marche\", \"mode\": \"auto\", \"sens\": \"montée\", \"courant\": \"1\", \"tension\": \"239\", \"luminosite\": 50, \"resolution\": \"1080p\", \"emplacement\": \"Local technique A\", \"vitesse_m_s\": 1.5, \"temperature_cible\": 20, \"maintenance_prevue\": \"2 mois\", \"derniere_inspection\": \"1 mois\"}'),(4,11,'2025-04-15 11:34:04','{\"etat\": \"marche\", \"mode\": \"eco\", \"sens\": \"montée\", \"courant\": 5, \"tension\": 220, \"luminosite\": 50, \"resolution\": \"1080p\", \"emplacement\": \"Hall A\", \"vitesse_m_s\": 1.5, \"temperature_cible\": \"12.5\", \"maintenance_prevue\": \"2 mois\", \"derniere_inspection\": \"1 mois\"}'),(5,13,'2025-04-15 10:58:37','{\"etat\": \"marche\", \"mode\": \"auto\", \"sens\": \"montée\", \"courant\": 5, \"tension\": 220, \"luminosite\": 50, \"resolution\": \"4K\", \"emplacement\": \"Entrée Est\", \"vitesse_m_s\": 1.5, \"temperature_cible\": 20, \"maintenance_prevue\": \"2 mois\", \"derniere_inspection\": \"1 mois\", \"etat_enregistrement\": \"marche\"}');
 /*!40000 ALTER TABLE `donnees_objet` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `eclairage_connecte`
+--
+
+DROP TABLE IF EXISTS `eclairage_connecte`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `eclairage_connecte` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idObjetConnecte` int NOT NULL,
+  `etat` varchar(50) DEFAULT NULL,
+  `mode` varchar(100) DEFAULT NULL,
+  `luminosite` int DEFAULT NULL,
+  `consommation_W` decimal(6,2) DEFAULT NULL,
+  `derniere_activation` datetime DEFAULT NULL,
+  `emplacement` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idObjetConnecte` (`idObjetConnecte`),
+  CONSTRAINT `eclairage_connecte_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `eclairage_connecte`
+--
+
+LOCK TABLES `eclairage_connecte` WRITE;
+/*!40000 ALTER TABLE `eclairage_connecte` DISABLE KEYS */;
+INSERT INTO `eclairage_connecte` VALUES (2,14,'allumée','détection de mouvement',70,15.50,'2025-04-14 21:30:11','Galerie centrale');
+/*!40000 ALTER TABLE `eclairage_connecte` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -93,6 +190,38 @@ LOCK TABLES `emplacement` WRITE;
 /*!40000 ALTER TABLE `emplacement` DISABLE KEYS */;
 INSERT INTO `emplacement` VALUES (1,15,'Rue des Lilas','Île-de-France','France');
 /*!40000 ALTER TABLE `emplacement` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `escalator_connecte`
+--
+
+DROP TABLE IF EXISTS `escalator_connecte`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `escalator_connecte` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idObjetConnecte` int NOT NULL,
+  `vitesse_m_s` decimal(5,2) DEFAULT NULL,
+  `sens` varchar(50) DEFAULT NULL,
+  `etat` varchar(50) DEFAULT NULL,
+  `maintenance_prevue` date DEFAULT NULL,
+  `derniere_inspection` date DEFAULT NULL,
+  `emplacement` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idObjetConnecte` (`idObjetConnecte`),
+  CONSTRAINT `escalator_connecte_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `escalator_connecte`
+--
+
+LOCK TABLES `escalator_connecte` WRITE;
+/*!40000 ALTER TABLE `escalator_connecte` DISABLE KEYS */;
+INSERT INTO `escalator_connecte` VALUES (2,12,0.65,'montant','en service','2025-05-10','2025-04-10','Entrée principale');
+/*!40000 ALTER TABLE `escalator_connecte` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -126,7 +255,7 @@ CREATE TABLE `objet_connecte` (
   CONSTRAINT `fk_objet_utilisateur` FOREIGN KEY (`ajoutePar`) REFERENCES `utilisateur` (`idUtilisateur`),
   CONSTRAINT `objet_connecte_ibfk_1` FOREIGN KEY (`idPlateforme`) REFERENCES `plateforme` (`idPlateforme`),
   CONSTRAINT `objet_connecte_ibfk_2` FOREIGN KEY (`idType`) REFERENCES `type_objet_connecte` (`idType`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +264,7 @@ CREATE TABLE `objet_connecte` (
 
 LOCK TABLES `objet_connecte` WRITE;
 /*!40000 ALTER TABLE `objet_connecte` DISABLE KEYS */;
-INSERT INTO `objet_connecte` VALUES (1,'Thermosta',1,'Electronique','Theromosta inétligent',NULL,NULL,'2025-04-13 09:38:00',NULL,NULL,NULL,NULL,NULL),(5,'Télé',1,'klzkzk','kkk',1,1,'2025-04-13 14:22:30',43,NULL,NULL,NULL,NULL),(7,'refrigirateur',1,'ele','',1,1,'2025-04-14 11:33:33',42,NULL,NULL,NULL,NULL),(8,'Alarme niveau 1',1,'Alarme intrusion','',1,0,'2025-04-14 20:30:00',42,NULL,NULL,1,NULL),(9,'s;,sk',1,'Porte connectée','mlsslmk',1,0,'2025-04-14 21:30:53',42,NULL,NULL,1,NULL),(10,'ss',1,'Porte connectée','ss',1,0,'2025-04-14 21:43:02',42,NULL,NULL,1,NULL);
+INSERT INTO `objet_connecte` VALUES (1,'Thermosta',1,'Electronique','Theromosta inétligent',NULL,NULL,'2025-04-13 09:38:00',NULL,NULL,NULL,NULL,NULL),(8,'Alarme niveau 1',1,'Alarme intrusion','',1,0,'2025-04-14 20:30:00',42,NULL,NULL,1,NULL),(11,'Thermostat Hall',1,'Thermostat connecté','Gère la température du hall principal',1,1,'2025-04-14 23:31:44',42,NULL,NULL,3,'Hall A'),(12,'Escalator Principal',1,'Escalator connecté','Escalator entre RDC et 1er étage',1,1,'2025-04-14 23:31:44',42,NULL,NULL,5,'Entrée principale'),(13,'Caméra Sécurité 1',1,'Caméra connectée','Surveillance de l’entrée Est',1,1,'2025-04-14 23:31:44',42,NULL,NULL,8,'Entrée Est'),(14,'Lumière Galerie 1',1,'Lumière connectée','Éclairage automatique dans la galerie centrale',1,1,'2025-04-14 23:31:44',42,NULL,NULL,11,'Galerie centrale'),(15,'Compteur Bâtiment A',1,'Compteur électrique','Mesure la conso électrique du bâtiment A',1,1,'2025-04-14 23:31:44',42,NULL,NULL,9,'Local technique A');
 /*!40000 ALTER TABLE `objet_connecte` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -185,6 +314,35 @@ LOCK TABLES `statut` WRITE;
 /*!40000 ALTER TABLE `statut` DISABLE KEYS */;
 INSERT INTO `statut` VALUES (1,'client');
 /*!40000 ALTER TABLE `statut` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `thermostat_connecte`
+--
+
+DROP TABLE IF EXISTS `thermostat_connecte`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `thermostat_connecte` (
+  `idObjetConnecte` int NOT NULL,
+  `temperature_int` float DEFAULT NULL,
+  `temperature_ext` float DEFAULT NULL,
+  `hygrometrie` float DEFAULT NULL,
+  `derniere_maj` datetime DEFAULT NULL,
+  `emplacement` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`idObjetConnecte`),
+  CONSTRAINT `thermostat_connecte_ibfk_1` FOREIGN KEY (`idObjetConnecte`) REFERENCES `objet_connecte` (`idObjetConnecte`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `thermostat_connecte`
+--
+
+LOCK TABLES `thermostat_connecte` WRITE;
+/*!40000 ALTER TABLE `thermostat_connecte` DISABLE KEYS */;
+INSERT INTO `thermostat_connecte` VALUES (11,21.5,13.2,45,'2025-04-14 23:38:53','Hall A');
+/*!40000 ALTER TABLE `thermostat_connecte` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -257,7 +415,7 @@ CREATE TABLE `utilisateur` (
 
 LOCK TABLES `utilisateur` WRITE;
 /*!40000 ALTER TABLE `utilisateur` DISABLE KEYS */;
-INSERT INTO `utilisateur` VALUES (13,1,1,21,'H',NULL,0,1,'jaliskkkk@gmail.com','01020304','klingler','jalis',NULL,'standard',0,NULL,NULL,NULL,NULL),(19,1,1,21,'h',NULL,0,1,'a@gmail.com','01020304','KLINGLER','Jalis','1744016954773-645478264.png','standard',0,NULL,NULL,NULL,NULL),(20,1,1,21,'h',NULL,0,1,'aa@gmail.com','01020304','KLINGLER','Jalis','1744017007624-861867569.png','standard',0,NULL,NULL,NULL,NULL),(21,1,1,21,'h',NULL,0,1,'aaa@gmail.com','01020304','KLINGLER','Jalis','1744017093006-875168518.png','standard',0,NULL,NULL,NULL,NULL),(22,1,1,21,'h',NULL,0,1,'jalisaa@gmail.com','01020304','klingler','jalis','1744017123972-485217879.png','standard',0,NULL,NULL,NULL,NULL),(23,1,1,21,'h',NULL,0,1,'k@gmail.com','01020304','kk','jjaj','1744017257597-132865946.png','standard',0,NULL,NULL,NULL,NULL),(24,1,1,21,'H',NULL,0,1,'jaja@gmail.com','01020304','klingler','jalis','1744017371013-199539355.png','standard',0,NULL,NULL,NULL,NULL),(25,1,1,21,'H',NULL,0,1,'kaka@gmail.com','01020304','klingler','jaja',NULL,'standard',0,NULL,NULL,NULL,NULL),(26,1,1,21,'H',NULL,0,1,'123@gmail.com','01020304','KLINGLER','Jalis','1744017986911-884785289.png','standard',0,NULL,NULL,NULL,NULL),(28,1,1,21,'h',NULL,0,1,'jalisklingler@gmail.com','01020304','KLINGLER','Jalis','1744186862864-483437556.png','standard',0,'b92eadbbe83ba0de4212b932c43398b82c37f69414bc9369df14639b4bfb4ac7','2025-04-09 11:21:03',NULL,NULL),(34,1,1,27,'18',NULL,0,1,'datomex573@movfull.com','0000','45','kJJJ','1744190539816-777650333.png','standard',1,NULL,NULL,NULL,NULL),(42,1,1,90,'Homme','2003-02-06',61,1,'jalisklingler845@gmail.com','0000','KLINGLER','Bo','1744628970387-44147680.webp','admin',1,NULL,NULL,'702683086ae9eac062c5120a081ce0da5ce2b88beab121aaa2c730271a3dc52c','2025-04-14 17:55:21'),(43,1,1,19,'F',NULL,20,1,'sasej99116@naobk.com','0000','Jktou','Bilelou',NULL,'standard',1,NULL,NULL,NULL,NULL),(44,1,1,18,'F','2003-02-08',1,1,'jaaja@gmailc.com','01020301','k','k',NULL,'standard',0,'80c6ec0445d68a418184030b481384738c14abbd7fa5d233761584b16c993305','2025-04-13 08:20:29',NULL,NULL),(45,1,1,15,'kkk',NULL,1,1,'kkk@gmail.com','kkkkk','kk','kk',NULL,'standard',0,'7445a8ea7fd489f7b0befdd77c994bb1ba59220dc1ec0111069f680e8c5733b8','2025-04-13 20:53:13',NULL,NULL),(46,1,1,0,'h','2003-02-08',1,1,'JESUISun@gmail.com','0000','KLINGLERRRRR','Jalis',NULL,'standard',0,'47612eb474dc4b50bf1ccc3cd86f0bf5fcbefc05880746731ebfe48983d57263','2025-04-14 12:17:19',NULL,NULL);
+INSERT INTO `utilisateur` VALUES (13,1,1,21,'H',NULL,0,1,'jaliskkkk@gmail.com','01020304','klingler','jalis',NULL,'standard',0,NULL,NULL,NULL,NULL),(21,1,1,21,'h',NULL,0,1,'aaa@gmail.com','01020304','KLINGLER','Jalis','1744017093006-875168518.png','standard',0,NULL,NULL,NULL,NULL),(22,1,1,21,'h',NULL,15,1,'jalisaa@gmail.com','01020304','klingler','jalis','1744017123972-485217879.png','standard',0,NULL,NULL,NULL,NULL),(23,1,1,21,'h',NULL,0,1,'k@gmail.com','01020304','kk','jjaj','1744017257597-132865946.png','standard',0,NULL,NULL,NULL,NULL),(24,1,1,21,'H',NULL,0,1,'jaja@gmail.com','01020304','klingler','jalis','1744017371013-199539355.png','standard',0,NULL,NULL,NULL,NULL),(25,1,1,21,'H',NULL,0,1,'kaka@gmail.com','01020304','klingler','jaja',NULL,'standard',0,NULL,NULL,NULL,NULL),(26,1,1,21,'H',NULL,0,1,'123@gmail.com','01020304','KLINGLER','Jalis','1744017986911-884785289.png','standard',0,NULL,NULL,NULL,NULL),(28,1,1,21,'h',NULL,0,1,'jalisklingler@gmail.com','01020304','KLINGLER','Jalis','1744186862864-483437556.png','standard',0,'b92eadbbe83ba0de4212b932c43398b82c37f69414bc9369df14639b4bfb4ac7','2025-04-09 11:21:03',NULL,NULL),(34,1,1,27,'18',NULL,0,1,'datomex573@movfull.com','0000','45','kJJJ','1744190539816-777650333.png','standard',1,NULL,NULL,NULL,NULL),(42,1,1,90,'Homme','2003-02-05',67,1,'jalisklingler845@gmail.com','0000','KLINGLER','Bo','1744628970387-44147680.webp','admin',1,NULL,NULL,'702683086ae9eac062c5120a081ce0da5ce2b88beab121aaa2c730271a3dc52c','2025-04-14 17:55:21'),(43,1,1,19,'F',NULL,20,1,'sasej99116@naobk.com','0000','Jktou','Bilelou',NULL,'standard',1,NULL,NULL,NULL,NULL),(44,1,1,18,'F','2003-02-08',1,1,'jaaja@gmailc.com','01020301','k','k',NULL,'standard',0,'80c6ec0445d68a418184030b481384738c14abbd7fa5d233761584b16c993305','2025-04-13 08:20:29',NULL,NULL),(45,1,1,15,'kkk',NULL,1,1,'kkk@gmail.com','kkkkk','kk','kk',NULL,'standard',0,'7445a8ea7fd489f7b0befdd77c994bb1ba59220dc1ec0111069f680e8c5733b8','2025-04-13 20:53:13',NULL,NULL),(46,1,1,0,'h','2003-02-08',1,1,'JESUISun@gmail.com','0000','KLINGLERRRRR','Jalis',NULL,'standard',0,'47612eb474dc4b50bf1ccc3cd86f0bf5fcbefc05880746731ebfe48983d57263','2025-04-14 12:17:19',NULL,NULL);
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -270,4 +428,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-14 23:23:55
+-- Dump completed on 2025-04-15 14:58:10

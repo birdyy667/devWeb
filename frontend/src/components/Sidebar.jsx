@@ -8,8 +8,9 @@ function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
-    navigate("/connexion");
+    window.location.href = "/"; // Redirection vers la landing page
   };
+  
 
   const navItem = (to, icon, label) => (
     <Link
