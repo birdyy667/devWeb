@@ -1,10 +1,10 @@
-# 🏬 Accessly – Plateforme de gestion de centre commercial
+# Accessly – Plateforme de gestion de centre commercial
 
 Bienvenue sur **Accessly**, une plateforme intelligente de gestion d'un centre commercial, développée dans le cadre du projet de développement web à CY Tech.
 
 ---
 
-## 🚀 Lancer le projet en local
+## Lancer le projet en local
 
 ### 1. Cloner le dépôt
 ```bash
@@ -66,7 +66,7 @@ localhost:5173
 ```
 ---
 
-## ✨ Fonctionnalités développées
+## Fonctionnalités développées
 
 ### ✅ Authentification
 - Création de compte avec vérification par email
@@ -105,13 +105,13 @@ localhost:5173
 
 ---
 
-## 🔐 Sécurité
+## Sécurité
 - Jetons de confirmation et de réinitialisation de mot de passe
 - Middleware de route privée pour bloquer l’accès sans login
 
 ---
 
-## 📁 Arborescence simplifiée
+## Arborescence simplifiée
 
 ```
 ├── backend
@@ -127,7 +127,7 @@ localhost:5173
 
 ---
 
-## 👨‍💻 Développé avec :
+## Développé avec :
 - Node.js + Express
 - React + Vite
 - MySQL
