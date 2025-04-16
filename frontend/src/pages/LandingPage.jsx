@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Register from "./Register";
 import Login from "./Login";
+import ForgotPassword from './ForgotPassword';
+
 
 function LandingPage() {
     const location = useLocation();
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -164,7 +167,7 @@ function LandingPage() {
 {showLoginModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onClick={() => setShowLoginModal(false)}>
           <div className="bg-white rounded-lg w-full max-w-md p-6 relative" onClick={(e) => e.stopPropagation()}>
-            <Login
+          <Login
               onSuccess={() => {
                 setShowLoginModal(false);
                 window.location.href = "/dashboard";
@@ -173,10 +176,29 @@ function LandingPage() {
                 setShowLoginModal(false);
                 setShowRegisterModal(true);
               }}
+              onForgotPassword={() => {
+                setShowLoginModal(false);
+                setShowForgotPasswordModal(true);
+              }}
             />
           </div>
         </div>
       )}
+
+{showForgotPasswordModal && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    onClick={() => setShowForgotPasswordModal(false)}
+  >
+    <div
+      className="bg-white rounded-lg w-full max-w-md p-6 relative"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <ForgotPassword onSuccess={() => setShowForgotPasswordModal(false)} />
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

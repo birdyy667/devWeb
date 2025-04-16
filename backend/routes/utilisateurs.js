@@ -321,6 +321,8 @@ router.put('/reset-password/:token', (req, res) => {
 });
 
 
+
+
 module.exports = router;
 
 
@@ -351,29 +353,78 @@ router.post('/login', (req, res) => {
     }
 
     // ✅ Incrémentation des points de 1
-    const updatePoints = `
-      UPDATE utilisateur SET point = point + 1 WHERE idUtilisateur = ?
-    `;
+    const updatePoints = `UPDATE utilisateur SET point = point + 1 WHERE idUtilisateur = ?`;
 
     db.query(updatePoints, [utilisateur.idUtilisateur], (updateErr) => {
       if (updateErr) {
-        console.error("❌ Erreur lors de la mise à jour des points :", updateErr);
+        console.error("❌ Erreur mise à jour des points :", updateErr);
         return res.status(500).json({ error: "Erreur interne (points)" });
       }
 
-      // ✅ Réponse finale avec succès
-      res.status(200).json({
-        message: 'Connexion réussie ✅',
-        utilisateur: {
-          id: utilisateur.idUtilisateur,
-          email: utilisateur.email,
-          age: utilisateur.age,
-          genre: utilisateur.genre
+      // ✅ Enregistrement dans l'historique de connexion
+      const insertHistorique = `
+        INSERT INTO historique_connexion (idUtilisateur, adresseIP, navigateur)
+        VALUES (?, ?, ?)
+      `;
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
+      const userAgent = req.headers['user-agent'] || '';
+
+      db.query(insertHistorique, [utilisateur.idUtilisateur, ip, userAgent], (errHist) => {
+        if (errHist) {
+          console.error("❌ Erreur insertion historique :", errHist);
+          // Ne bloque pas la réponse même si erreur
         }
+        
+        // ✅ Réponse finale
+        res.status(200).json({
+          message: 'Connexion réussie ✅',
+          utilisateur: {
+            id: utilisateur.idUtilisateur,
+            email: utilisateur.email,
+            age: utilisateur.age,
+            genre: utilisateur.genre
+          }
+        });
       });
     });
   });
 });
+
+
+
+router.get('/historique/:id', (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT 
+      hc.dateConnexion,
+      hc.adresseIP,
+      hc.navigateur,
+      u.prenom,
+      u.point
+    FROM historique_connexion hc
+    JOIN utilisateur u ON hc.idUtilisateur = u.idUtilisateur
+    WHERE hc.idUtilisateur = ?
+    ORDER BY hc.dateConnexion DESC
+    LIMIT 50
+  `;
+
+  db.query(sql, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: "Erreur SQL" });
+    
+    // Ajout du calcul du niveau
+    const enriched = result.map(row => {
+      let niveau = 1;
+      if (row.point >= 15) niveau = 4;
+      else if (row.point >= 10) niveau = 3;
+      else if (row.point >= 5) niveau = 2;
+      return { ...row, niveau };
+    });
+
+    res.json(enriched);
+  });
+});
+
 
 
   //ROUT Post re-innitialisation mot de passe

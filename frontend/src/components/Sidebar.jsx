@@ -1,33 +1,62 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showDot, setShowDot] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
-    window.location.href = "/"; // Redirection vers la landing page
+    window.location.href = "/";
   };
-  
 
-  const navItem = (to, icon, label) => (
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    fetch(`http://localhost:3001/api/utilisateur/${userId}`)
+      .then(res => res.json())
+      .then(user => {
+        const niveau = parseInt(user.point || 0, 10);
+        const isAdmin = user.typeMembre === "admin";
+
+        if (isAdmin || niveau >= 4) {
+          fetch("http://localhost:3001/api/objets-connectes/a-valider")
+            .then(res => res.json())
+            .then(objets => {
+              const enAttente = isAdmin
+                ? objets.length > 0
+                : objets.some(o => o.ajoutePar === user.idUtilisateur);
+
+              setShowDot(enAttente);
+            })
+            .catch(() => {});
+        }
+      });
+  }, []);
+
+  const navItem = (to, icon, label, withDot = false) => (
     <Link
       to={to}
-      className={`flex items-center gap-3 px-2 py-2 rounded-md transition ${
+      className={`flex items-center justify-between gap-3 px-2 py-2 rounded-md transition ${
         isActive(to) ? "text-blue-600 font-semibold" : "hover:text-blue-500 text-gray-700"
       }`}
     >
-      <span className="w-5 h-5">{icon}</span>
-      {label}
+      <div className="flex items-center gap-3">
+        <span className="w-5 h-5">{icon}</span>
+        {label}
+      </div>
+      {withDot && (
+        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse mr-1" />
+      )}
     </Link>
   );
 
   return (
-
-<aside className="fixed top-0 left-0 w-64 h-screen bg-white shadow-md flex flex-col justify-between py-6 px-4 font-sans z-50">
-      {/* Logo */}
+    <aside className="fixed top-0 left-0 w-64 h-screen bg-white shadow-md flex flex-col justify-between py-6 px-4 font-sans z-50">
       <div>
         <div className="flex items-center mb-12 px-2">
           <div className="bg-blue-600 w-9 h-9 rounded-lg flex items-center justify-center mr-2">
@@ -36,7 +65,6 @@ function Sidebar() {
           <span className="text-xl font-semibold text-gray-800">Accessly</span>
         </div>
 
-        {/* Navigation */}
         <nav className="flex flex-col space-y-4 text-[15px] font-medium">
           {navItem(
             "/dashboard",
@@ -56,17 +84,22 @@ function Sidebar() {
           {navItem(
             "/valider-objets",
             <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>,
-            "À valider"
+            "À valider",
+            showDot
           )}
           {navItem(
             "/rapport",
             <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 3h10v18H3V9l8-6z"/></svg>,
             "Rapport"
           )}
+          {navItem(
+            "/historique",
+            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/></svg>,
+            "Historique"
+          )}
         </nav>
       </div>
 
-      {/* Déconnexion */}
       <div className="mt-10 px-2">
         <button
           onClick={handleLogout}

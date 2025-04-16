@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Login({ onSuccess, onSwitch }) {
+function Login({ onSuccess, onSwitch,onForgotPassword }) {
   const [formData, setFormData] = useState({
     email: '',
     motDePasse: ''
@@ -77,6 +77,16 @@ function Login({ onSuccess, onSwitch }) {
       {message && (
         <p className="mt-4 text-center text-sm text-red-600">{message}</p>
       )}
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={onForgotPassword}
+            className="text-sm text-blue-600 hover:underline font-medium"
+          >
+            Mot de passe oublié ?
+          </button>
+        </div>
 
       <div className="mt-6 text-center text-sm text-gray-600">
         <span>Pas encore de compte ? </span>

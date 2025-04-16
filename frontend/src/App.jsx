@@ -17,9 +17,9 @@ import Rapport from './pages/Rapport';
 import LandingPage from './pages/LandingPage';
 import GestionObjets from './pages/GestionObjets';
 
-import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import PrivateLayout from './layouts/PrivateLayout';
+import HistoriqueConnexion from "./pages/HistoriqueConnexion";
 
 
 function AppWrapper() {
@@ -28,7 +28,6 @@ function AppWrapper() {
 
   return (
     <>
-      {!hideLayout && <Navbar />}
       <Routes>
         {/* Routes publiques */}
         <Route path="/" element={<LandingPage />} />
@@ -47,6 +46,7 @@ function AppWrapper() {
         <Route path="/valider-objets" element={<PrivateRoute><PrivateLayout><ValiderObjets /></PrivateLayout></PrivateRoute>} />
         <Route path="/rapport" element={<PrivateRoute><PrivateLayout><Rapport /></PrivateLayout></PrivateRoute>} />
         <Route path="/gestion-objets" element={<PrivateRoute><PrivateLayout><GestionObjets /></PrivateLayout></PrivateRoute>} />
+        <Route path="/historique" element={<PrivateRoute><PrivateLayout><HistoriqueConnexion /></PrivateLayout></PrivateRoute>} />
 
       </Routes>
     </>

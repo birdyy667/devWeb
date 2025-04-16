@@ -407,6 +407,70 @@ router.get("/rapport", (req, res) => {
   });
 });
 
+// ✅ Route pour valider un objet (mise à jour estValide à 1)
+router.put("/valider/:id", (req, res) => {
+  const { id } = req.params;
+
+  // Étape 1 : validation de l'objet
+  const sqlValidation = `
+    UPDATE objet_connecte 
+    SET estValide = 1 
+    WHERE idObjetConnecte = ?
+  `;
+
+  db.query(sqlValidation, [id], (err, result) => {
+    if (err) {
+      console.error("❌ Erreur SQL validation :", err);
+      return res.status(500).json({ error: "Erreur lors de la validation" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Objet non trouvé" });
+    }
+
+    // Étape 2 : récupération du type d'objet
+    const sqlType = `
+      SELECT typeObjet FROM objet_connecte WHERE idObjetConnecte = ?
+    `;
+
+    db.query(sqlType, [id], (err2, result2) => {
+      if (err2 || result2.length === 0) {
+        console.error("❌ Erreur récupération type après validation :", err2);
+        return res.status(500).json({ error: "Erreur lors de la récupération du type d'objet" });
+      }
+
+      const typeObjet = result2[0].typeObjet;
+
+      // Étape 3 : insertion des données par défaut
+      const valeursParDefaut = {
+        "Thermostat connecté": { temperature_cible: 20, mode: "auto", emplacement: "Non spécifié" },
+        "Escalateur connecté": { vitesse_m_s: 1.5, sens: "montée", etat: "marche", maintenance_prevue: "2 mois", derniere_inspection: "1 mois", emplacement: "Non spécifié" },
+        "Lumière connectée": { etat: "marche", mode: "auto", luminosite: 50, emplacement: "Non spécifié" },
+        "Compteur électrique": { courant: 5, tension: 220, emplacement: "Non spécifié" }
+      };
+      
+
+      const donnees = JSON.stringify(valeursParDefaut[typeObjet] || {});
+
+      const sqlInsert = `
+        INSERT INTO donnees_objet (idObjetConnecte, donnees)
+        VALUES (?, ?)
+      `;
+
+      db.query(sqlInsert, [id, donnees], (err3) => {
+        if (err3) {
+          console.error("⚠️ Erreur insertion des données par défaut :", err3);
+          // Non bloquant : on continue même si l’insertion échoue
+        }
+
+        res.status(200).json({ message: "✅ Objet validé et initialisé avec succès" });
+      });
+    });
+  });
+});
+
+
+
 // ✅ Récupérer les objets en attente de validation
 router.get("/a-valider", (req, res) => {
   const sql = `

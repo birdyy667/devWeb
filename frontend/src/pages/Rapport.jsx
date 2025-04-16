@@ -8,6 +8,8 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { BarChart2 } from "lucide-react";
+
 
 
 const genererMessage = (objet, moyennes, derniereValeur) => {
@@ -231,8 +233,13 @@ function Rapport() {
 
   return (
     <div className="p-8 font-sans">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">📊 Rapport des Objets Connectés</h1>
-      {objets.map((objet) => (
+
+      <div className="flex items-center gap-2 mb-6">
+        <BarChart2 className="text-blue-600" size={28} />
+        <h1 className="text-3xl font-bold text-gray-800">Rapport des Objets Connectés</h1>
+      </div>
+
+          {objets.map((objet) => (
         <div key={objet.idObjet} className="mb-10 bg-white rounded-lg shadow p-6">
           <div className="mb-2 text-lg font-semibold text-blue-600">{objet.nom} ({objet.type})</div>
           <div className="text-sm text-gray-600 mb-4">
